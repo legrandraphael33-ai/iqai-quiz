@@ -371,19 +371,25 @@
       };
     }
 
-    // Review
-    reviewContainer.innerHTML="<h3>Review des questions</h3>";
-    questions.forEach((q,i)=>{
-      const div=document.createElement('div');
-      div.className="reviewItem";
-      div.innerHTML=`
-        <strong>Q${i+1}:</strong> ${q.q}<br>
-        <strong>Votre réponse:</strong> ${userAnswers[i] ?? "—"}<br>
-        <strong>Bonne réponse:</strong> ${q.answer}<br>
-        <em>Explication:</em> ${q.explanation}
-      `;
-      reviewContainer.appendChild(div);
-    });
+  // Review (surligne faux / vrai)
+reviewContainer.innerHTML="<h3>Correction</h3>";
+questions.forEach((q,i)=>{
+  const user = userAnswers[i];
+  const isOk = (user != null && user === q.answer);
+
+  const div=document.createElement('div');
+  div.className="reviewItem";
+  div.innerHTML=`
+    <strong>Q${i+1}:</strong> ${q.q}<br>
+    <strong>Votre réponse:</strong>
+      <span class="answerTag ${isOk ? "ok" : "bad"}">${user ?? "—"}</span><br>
+    <strong>Bonne réponse:</strong>
+      <span class="answerTag ok">${q.answer}</span><br>
+    <em>Explication:</em> ${q.explanation}
+  `;
+  reviewContainer.appendChild(div);
+});
+
   }
 
   // ---------- START / RESTART ----------
