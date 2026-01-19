@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IQAI Test - I Quit AI</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -19,7 +19,7 @@
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;
-    background: linear-gradient(135deg,#f4cda7,#e7a86a);
+    background: linear-gradient(135deg,#f0c79e,#e3a56b);
     padding:20px;
     font-family: var(--body-font);
   }
@@ -44,23 +44,39 @@
     letter-spacing:0.2px;
   }
   .container{
-    max-width:550px;width:100%;
+    max-width:560px;width:100%;
     background:#ffffff;color:#333;
     border-radius:18px;
     padding:26px;
     box-shadow:0 10px 28px rgba(0,0,0,0.18);
   }
-  .question{margin-bottom:14px;font-weight:800;font-size:1.05em;line-height:1.35;}
+
+  .question{
+    margin-bottom:14px;
+    font-weight:800;
+    font-size:1.05em;
+    line-height:1.35;
+  }
+
   .options button{
-    margin:6px 0;width:100%;
+    margin:6px 0;
+    width:100%;
     padding:12px 14px 12px 44px;
-    border:none;border-radius:12px;
-    background:#ff8f00;color:#fff;
-    cursor:pointer;font-weight:800;
-    transition:0.2s;position:relative;text-align:left;
-    font-family:var(--body-font);font-size:1em;
+    border:none;
+    border-radius:12px;
+    background:#ff8f00;
+    color:#fff;
+    cursor:pointer;
+    font-weight:800;
+    transition:0.2s;
+    position:relative;
+    text-align:left;
+    font-family:var(--body-font);
+    font-size:1em;
   }
   .options button:hover{background:#f57c00;}
+
+  /* Surbrillance sélection (sans indiquer vrai/faux) */
   .options button.selected{
     background:#263238 !important;
     outline:3px solid rgba(255,143,0,0.55);
@@ -72,7 +88,7 @@
     position:absolute;left:12px;top:50%;
     transform:translateY(-50%);
     width:20px;height:20px;border-radius:6px;
-    border:2px solid rgba(255,255,255,0.8);
+    border:2px solid rgba(255,255,255,0.85);
     background:rgba(255,255,255,0.12);
   }
   .options button.selected::before{
@@ -81,36 +97,58 @@
     font-weight:900;color:#fff;
     background:rgba(255,255,255,0.25);
   }
+
   #nextBtn{
     margin-top:12px;width:100%;
     padding:12px;border:none;border-radius:12px;
     background:#263238;color:#fff;
     cursor:pointer;font-weight:800;
-    transition:0.2s;font-family:var(--body-font);font-size:1em;
+    transition:0.2s;
+    font-family:var(--body-font);
+    font-size:1em;
   }
   #nextBtn:hover{filter:brightness(1.05);}
   #nextBtn:disabled{opacity:0.55;cursor:not-allowed;}
+
   .score,.streak,.feedback{text-align:center;margin-top:10px;}
-  .feedback{font-style:italic;color:#27ae60;font-weight:700;}
+  .feedback{font-style:italic;color:#27ae60;font-weight:800;}
+
   #perfectToken{margin-top:15px;text-align:center;}
   #shareBtn{
     margin-top:10px;padding:10px 15px;
     background:#0077b5;color:#fff;border:none;border-radius:10px;
-    cursor:pointer;font-weight:800;display:block;margin-left:auto;margin-right:auto;
+    cursor:pointer;font-weight:900;
+    display:block;margin-left:auto;margin-right:auto;
   }
   #restartBtn{
     margin-top:12px;width:100%;
     padding:12px;border:none;border-radius:12px;
-    background:#37474f;color:#fff;cursor:pointer;font-weight:800;
+    background:#37474f;color:#fff;cursor:pointer;font-weight:900;
   }
+
   .hidden{display:none;}
+
   #reviewContainer{margin-top:18px;}
   #reviewContainer h3{margin:8px 0 10px;font-size:1.05em;}
   .reviewItem{
-    padding:10px 12px;border:1px solid rgba(0,0,0,0.08);
+    padding:10px 12px;
+    border:1px solid rgba(0,0,0,0.08);
     border-radius:12px;margin-bottom:10px;
     background:rgba(0,0,0,0.02);
-    line-height:1.35;font-size:0.98em;
+    line-height:1.35;
+    font-size:0.98em;
+  }
+
+  .errorBox{
+    margin-top:10px;
+    padding:12px;
+    border-radius:12px;
+    background:#fff3f3;
+    border:1px solid rgba(255,0,0,0.15);
+    color:#8a1f1f;
+    font-weight:700;
+    line-height:1.35;
+    font-size:0.98em;
   }
 </style>
 </head>
@@ -124,6 +162,7 @@
       <div id="questionContainer"></div>
       <div class="options" id="optionsContainer"></div>
       <button id="nextBtn" disabled>Suivant</button>
+      <div id="errorContainer" class="hidden"></div>
     </div>
 
     <div id="result" class="hidden">
@@ -138,7 +177,7 @@
   </div>
 
 <script>
-  // Title
+  // ---------- TITLE ----------
   const colors=["#FF4136","#FFDC00","#2ECC40","#0074D9","#FF851B","#B10DC9"];
   const titleContainer=document.getElementById("title");
   const parts=["IQAI","Test"];
@@ -160,27 +199,18 @@
   titleContainer.appendChild(sep);
   addColored(parts[1]);
 
-  // Questions (temp)
-  const questions = [
-    {q:"Combien font 23 x 17 ?",options:["391","401","403","421"],answer:"391",explanation:"23 x 17 = 391"},
-    {q:"Quelle forme est correcte ?",options:["Je vais allé","Je vais aller","Je vas aller","Je va allé"],answer:"Je vais aller",explanation:"Futur proche correct : 'Je vais aller'"},
-    {q:"Traduire 'to challenge oneself' en français",options:["Se détendre","Se challenger","Se lever","S'amuser"],answer:"Se challenger",explanation:"L'expression correcte est 'se challenger'"},
-    {q:"Qui a écrit 'Les Misérables' ?",options:["Victor Hugo","Emile Zola","Alphonse Daudet","Stendhal"],answer:"Victor Hugo",explanation:"Victor Hugo est l'auteur"},
-    {q:"Complétez la suite : 2, 3, 5, 8, 12, ?",options:["15","16","17","18"],answer:"17",explanation:"Règle : +1,+2,+3,+4,+5... Donc 12+5=17"},
-    {q:"Capitale de la Croatie ?",options:["Split","Zagreb","Dubrovnik","Rijeka"],answer:"Zagreb",explanation:"Zagreb est la capitale"},
-    {q:"Féminin de 'héros'",options:["Hérosse","Héresse","Héroïne","Héruine"],answer:"Héroïne",explanation:"Le féminin correct est 'Héroïne'"},
-    {q:"Traduire 'reliable' en français",options:["Fiable","Rapide","Fort","Agréable"],answer:"Fiable",explanation:"Reliable = Fiable"},
-    {q:"Année du premier pas sur la lune ?",options:["1965","1969","1971","1967"],answer:"1969",explanation:"Neil Armstrong a marché sur la lune en 1969"},
-    {q:"Résoudre : 18 ÷ (3+3) + 4 ?",options:["7","8","6","10"],answer:"7",explanation:"18 ÷ 6 + 4 = 3 + 4 = 7"}
-  ];
+  // ---------- STATE ----------
+  const API_URL = "https://iqai-backend.vercel.app/api/quiz";
 
-  let current=0, score=0;
-  const userAnswers = new Array(questions.length).fill(null);
+  let questions = [];
+  let current = 0;
+  let score = 0;
+  let userAnswers = [];
 
+  // ---------- DOM ----------
   const questionContainer=document.getElementById('questionContainer');
   const optionsContainer=document.getElementById('optionsContainer');
   const nextBtn=document.getElementById('nextBtn');
-
   const quizDiv=document.getElementById('quiz');
   const resultDiv=document.getElementById('result');
 
@@ -192,56 +222,124 @@
   const shareBtn=document.getElementById('shareBtn');
   const restartBtn=document.getElementById('restartBtn');
   const reviewContainer=document.getElementById('reviewContainer');
+  const errorContainer=document.getElementById('errorContainer');
 
-  // Streak
+  // ---------- STREAK ----------
   const todayKey=new Date().toDateString();
   let streak=parseInt(localStorage.getItem('streak')||'0');
   let lastPlayed=localStorage.getItem('lastPlayed');
   if(lastPlayed!==todayKey && lastPlayed!==new Date(Date.now()-86400000).toDateString()) streak=0;
 
+  // ---------- HELPERS ----------
+  function showError(msg){
+    errorContainer.classList.remove('hidden');
+    errorContainer.className = "errorBox";
+    errorContainer.textContent = msg;
+  }
+  function clearError(){
+    errorContainer.classList.add('hidden');
+    errorContainer.className = "";
+    errorContainer.textContent = "";
+  }
+
+  function normalizeQuiz(raw){
+    // Supporte ton format attendu: q/options/answer/explanation
+    if(!Array.isArray(raw)) return null;
+
+    // petit garde-fou: on accepte 8-12 au cas où, mais on vise 10
+    const arr = raw.slice(0, 10).map(x => ({
+      q: String(x.q ?? ""),
+      options: Array.isArray(x.options) ? x.options.map(String).slice(0,4) : [],
+      answer: String(x.answer ?? ""),
+      explanation: String(x.explanation ?? "")
+    })).filter(x => x.q && x.options.length === 4 && x.answer);
+
+    return arr.length ? arr : null;
+  }
+
+  async function loadQuestions(){
+    const res = await fetch(API_URL, { cache: "no-store" });
+    if(!res.ok){
+      throw new Error("Le backend ne répond pas (HTTP " + res.status + ").");
+    }
+    const raw = await res.json();
+    const quiz = normalizeQuiz(raw);
+    if(!quiz || quiz.length !== 10){
+      throw new Error("Le quiz reçu est invalide. Réessaie.");
+    }
+    questions = quiz;
+  }
+
+  // ---------- QUIZ UI ----------
   function showQuestion(){
+    clearError();
     const q=questions[current];
     questionContainer.innerHTML=`<div class="question">${current+1}. ${q.q}</div>`;
     optionsContainer.innerHTML='';
-    nextBtn.disabled=true;
+    nextBtn.disabled = (userAnswers[current] == null);
 
     q.options.forEach(opt=>{
       const btn=document.createElement('button');
       btn.textContent=opt;
+
       if(userAnswers[current]===opt) btn.classList.add('selected');
-      btn.onclick=()=>selectOption(opt);
+
+      btn.onclick=()=>{
+        userAnswers[current]=opt;
+        Array.from(optionsContainer.children).forEach(b=>{
+          b.classList.toggle('selected', b.textContent===opt);
+        });
+        nextBtn.disabled=false;
+      };
+
       optionsContainer.appendChild(btn);
     });
-  }
-
-  function selectOption(selected){
-    userAnswers[current]=selected;
-    Array.from(optionsContainer.children).forEach(btn=>{
-      btn.classList.toggle('selected', btn.textContent===selected);
-    });
-    nextBtn.disabled=false;
   }
 
   nextBtn.onclick=()=>{
     const selected=userAnswers[current];
     if(selected===questions[current].answer) score++;
     current++;
-    if(current<questions.length) showQuestion();
-    else showResult();
+
+    if(current<questions.length){
+      showQuestion();
+    } else {
+      showResult();
+    }
   };
 
   function generateTokenImage(){
     const ctx=perfectTokenCanvas.getContext('2d');
     ctx.clearRect(0,0,400,200);
-    ctx.fillStyle="#f1c40f";
+
+    // fond "badge"
+    const grad = ctx.createLinearGradient(0,0,400,200);
+    grad.addColorStop(0,"#f7d24c");
+    grad.addColorStop(1,"#ff9f1a");
+    ctx.fillStyle=grad;
     ctx.fillRect(0,0,400,200);
-    ctx.fillStyle="#2c3e50";
+
+    // cercle badge
+    ctx.fillStyle="rgba(0,0,0,0.12)";
+    ctx.beginPath();
+    ctx.arc(320,60,46,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle="#1f2a30";
     ctx.font="18px 'Press Start 2P'";
     ctx.textAlign="center";
-    ctx.fillText("🎉 Perfect Score 🎉",200,40);
-    ctx.fillText(`"AI? I Quit!"`,200,80);
-    ctx.fillText("Napoléon approves 😎",200,120);
-    return perfectTokenCanvas.toDataURL();
+    ctx.fillText("🎉 10/10 🎉",200,45);
+
+    ctx.font="14px 'Press Start 2P'";
+    ctx.fillText("AI? I Quit.",200,85);
+
+    ctx.font="12px 'Press Start 2P'";
+    ctx.fillText("Streak: " + streak + " days",200,125);
+
+    ctx.font="12px 'Press Start 2P'";
+    ctx.fillText(new Date().toLocaleDateString("fr-FR"),200,155);
+
+    return perfectTokenCanvas.toDataURL("image/png");
   }
 
   function showResult(){
@@ -251,24 +349,29 @@
     scoreDisplay.textContent=`Votre score : ${score} / ${questions.length}`;
     feedbackDisplay.textContent=
       score===questions.length ? "Parfait ! Vous êtes un génie !" :
-      score>4 ? "Bien joué, continuez !" :
-      "Courage, essayez encore demain !";
+      score>=7 ? "Très solide. Reviens demain." :
+      score>=4 ? "Bien joué, continue." :
+      "Courage. Reviens demain.";
 
     streak++;
     localStorage.setItem('streak',streak);
     localStorage.setItem('lastPlayed',todayKey);
     streakDisplay.textContent=`Streak actuel : ${streak} jours`;
 
+    // Token + share
     if(score===questions.length){
       perfectTokenCanvas.classList.remove('hidden');
-      const imgData=generateTokenImage();
+      generateTokenImage();
+
       shareBtn.classList.remove('hidden');
       shareBtn.onclick=()=>{
+        // LinkedIn partage surtout un lien: on partage l'URL du quiz
         const url="https://www.linkedin.com/sharing/share-offsite/?url="+encodeURIComponent(window.location.href);
         window.open(url,'_blank');
       };
     }
 
+    // Review
     reviewContainer.innerHTML="<h3>Review des questions</h3>";
     questions.forEach((q,i)=>{
       const div=document.createElement('div');
@@ -283,19 +386,40 @@
     });
   }
 
-  restartBtn.onclick=()=>{
-    current=0; score=0;
-    for(let i=0;i<userAnswers.length;i++) userAnswers[i]=null;
+  // ---------- START / RESTART ----------
+  async function startGame(){
+    clearError();
 
-    quizDiv.classList.remove('hidden');
+    // reset UI
     resultDiv.classList.add('hidden');
+    quizDiv.classList.remove('hidden');
+
     perfectTokenCanvas.classList.add('hidden');
     shareBtn.classList.add('hidden');
     reviewContainer.innerHTML="";
-    showQuestion();
+
+    current = 0;
+    score = 0;
+    nextBtn.disabled = true;
+    optionsContainer.innerHTML="";
+    questionContainer.innerHTML=`<div class="question">Chargement du quiz...</div>`;
+
+    try{
+      await loadQuestions();
+      userAnswers = new Array(questions.length).fill(null);
+      showQuestion();
+    } catch(e){
+      showError("Erreur de chargement du quiz. Recharge la page ou réessaie. (" + (e?.message || e) + ")");
+      questionContainer.innerHTML=`<div class="question">Impossible de charger le quiz.</div>`;
+      nextBtn.disabled = true;
+    }
+  }
+
+  restartBtn.onclick = async ()=>{
+    await startGame(); // recharge un quiz neuf
   };
 
-  showQuestion();
+  startGame();
 </script>
 </body>
 </html>
