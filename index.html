@@ -224,6 +224,15 @@
       <canvas id="perfectToken" class="hidden" width="400" height="200"></canvas>
       <button id="shareBtn" class="hidden">Partager sur LinkedIn</button>
       <div id="reviewContainer"></div>
+     <!-- Meme si score < 6/10 -->
+<div id="memeContainer" class="hidden" style="margin:14px auto 6px; max-width:520px;">
+  <img
+    id="memeImg"
+    src="./ai-brainwashed.jpg"
+    alt="AI brainwashed"
+    style="width:100%; border-radius:14px; display:block;"
+  />
+</div>
       <button id="restartBtn">Rejouer maintenant</button>
     </div>
   </div>
@@ -434,6 +443,13 @@ function showResult(){
 
   scoreDisplay.textContent=`Votre score : ${score} / ${questions.length}`;
   feedbackDisplay.textContent=
+     // --- Meme "AI brainwashed" si score < 6/10
+  const memeContainer = document.getElementById('memeContainer');
+  if (score < 6) {
+    memeContainer.classList.remove('hidden');
+  } else {
+    memeContainer.classList.add('hidden');
+  }
     score===questions.length ? "Parfait ! Vous êtes un génie !" :
     score>=7 ? "Très solide. Reviens demain." :
     score>=4 ? "Bien joué, continue." :
