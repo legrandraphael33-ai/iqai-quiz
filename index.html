@@ -368,53 +368,59 @@
     return perfectTokenCanvas.toDataURL("image/png");
   }
 
-  function showResult(){
-    quizDiv.classList.add('hidden');
-    resultDiv.classList.remove('hidden');
+function showResult(){
+  quizDiv.classList.add('hidden');
+  resultDiv.classList.remove('hidden');
 
-    scoreDisplay.textContent=`Votre score : ${score} / ${questions.length}`;
-    feedbackDisplay.textContent=
-      score===questions.length ? "Parfait ! Vous êtes un génie !" :
-      score>=7 ? "Très solide. Reviens demain." :
-      score>=4 ? "Bien joué, continue." :
-      "Courage. Reviens demain.";
+  scoreDisplay.textContent=`Votre score : ${score} / ${questions.length}`;
+  feedbackDisplay.textContent=
+    score===questions.length ? "Parfait ! Vous êtes un génie !" :
+    score>=7 ? "Très solide. Reviens demain." :
+    score>=4 ? "Bien joué, continue." :
+    "Courage. Reviens demain.";
 
-    streak++;
-    localStorage.setItem('streak',streak);
-    localStorage.setItem('lastPlayed',todayKey);
-    streakDisplay.textContent=`Streak actuel : ${streak} jours`;
+  // streak
+  streak++;
+  localStorage.setItem('streak',streak);
+  localStorage.setItem('lastPlayed',todayKey);
+  streakDisplay.textContent=`Streak actuel : ${streak} jours`;
 
-    // Token + share
-    if(score===questions.length){
-      perfectTokenCanvas.classList.remove('hidden');
-      generateTokenImage();
+  // token + share
+  if(score===questions.length){
+    perfectTokenCanvas.classList.remove('hidden');
+    generateTokenImage();
 
-      shareBtn.classList.remove('hidden');
-      shareBtn.onclick=()=>{
-        // LinkedIn partage surtout un lien: on partage l'URL du quiz
-        const url="https://www.linkedin.com/sharing/share-offsite/?url="+encodeURIComponent(window.location.href);
-        window.open(url,'_blank');
-      };
-    }
+    shareBtn.classList.remove('hidden');
+    shareBtn.onclick=()=>{
+      const url="https://www.linkedin.com/sharing/share-offsite/?url="+encodeURIComponent(window.location.href);
+      window.open(url,'_blank');
+    };
+  } else {
+    perfectTokenCanvas.classList.add('hidden');
+    shareBtn.classList.add('hidden');
+  }
 
- // Review (correction avec surlignage)
-reviewContainer.innerHTML="<h3>Correction</h3>";
-questions.forEach((q,i)=>{
-  const user = userAnswers[i];
-  const isOk = (user != null && user === q.answer);
+  // --- Review (avec badges ok/bad)
+  reviewContainer.innerHTML = "<h3>Review des questions <span style='font-size:12px;opacity:.6'>(v2)</span></h3>";
 
-  const div = document.createElement('div');
-  div.className = "reviewItem";
-  div.innerHTML = `
-    <strong>Q${i+1}:</strong> ${q.q}<br>
-    <strong>Votre réponse:</strong>
-      <span class="answerTag ${isOk ? "ok" : "bad"}">${user ?? "—"}</span><br>
-    <strong>Bonne réponse:</strong>
-      <span class="answerTag ok">${q.answer}</span><br>
-    <em>Explication:</em> ${q.explanation}
-  `;
-  reviewContainer.appendChild(div);
-});
+  questions.forEach((q,i)=>{
+    const user = userAnswers[i];
+    const isOk = (user != null && user === q.answer);
+
+    const div = document.createElement('div');
+    div.className = "reviewItem";
+    div.innerHTML = `
+      <strong>Q${i+1}:</strong> ${q.q}<br>
+      <strong>Votre réponse:</strong>
+        <span class="answerTag ${isOk ? "ok" : "bad"}">${user ?? "—"}</span><br>
+      <strong>Bonne réponse:</strong>
+        <span class="answerTag ok">${q.answer}</span><br>
+      <em>Explication:</em> ${q.explanation}
+    `;
+    reviewContainer.appendChild(div);
+  });
+}
+
 
 
   }
