@@ -172,6 +172,29 @@
   border: 1px solid rgba(255,60,120,0.40);
   color:#a8164a;
 }
+/* ---- Meme card (score < 6) ---- */
+.meme-card{
+  margin:20px auto;
+  padding:16px;
+  background:#fff;
+  border-radius:16px;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.meme-card img{
+  width:100%;
+  border-radius:12px;
+}
+
+.meme-text{
+  margin-top:10px;
+  font-weight:900;
+  font-size:22px;
+  color:#ff4d4f;
+  letter-spacing:1px;
+}
 
 </style>
 
@@ -421,6 +444,16 @@ function showResult(){
   localStorage.setItem('streak',streak);
   localStorage.setItem('lastPlayed',todayKey);
   streakDisplay.textContent=`Streak actuel : ${streak} jours`;
+ // --- Meme card (score < 6)
+const memeCard = document.getElementById("memeCard");
+const memeImg = document.getElementById("memeImg");
+
+if(score < 6){
+  memeCard.classList.remove("hidden");
+  memeImg.src = "https://i.imgur.com/3a1Q6RZ.png"; // Michael Scott grimace
+} else {
+  memeCard.classList.add("hidden");
+}
 
   // token + share
   if(score===questions.length){
