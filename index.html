@@ -477,22 +477,22 @@ function showResult(){
     optionsContainer.innerHTML="";
     questionContainer.innerHTML=`<div class="question">Chargement du quiz...</div>`;
 
-    try{
-      await loadQuestions();
-      userAnswers = new Array(questions.length).fill(null);
-      showQuestion();
-    } catch(e){
-      showError("Erreur de chargement du quiz. Recharge la page ou réessaie. (" + (e?.message || e) + ")");
-      questionContainer.innerHTML=`<div class="question">Impossible de charger le quiz.</div>`;
-      nextBtn.disabled = true;
-    }
+   (async () => {
+  try {
+    await loadQuestions();
+    userAnswers = new Array(questions.length).fill(null);
+    showQuestion();
+  } catch (e) {
+    showError("Erreur de chargement du quiz. Recharge la page ou réessaie. (" + (e?.message || e) + ")");
+    questionContainer.innerHTML = '<div class="question">Impossible de charger le quiz.</div>';
+    nextBtn.disabled = true;
   }
+})();
 
-  restartBtn.onclick = async ()=>{
-    await startGame(); // recharge un quiz neuf
-  };
+restartBtn.onclick = async () => {
+  await startGame();
+};
 
-  startGame();
 </script>
 </body>
 </html>
