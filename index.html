@@ -440,25 +440,27 @@ async function loadQuestions(){
 function showResult(){
   quizDiv.classList.add('hidden');
   resultDiv.classList.remove('hidden');
+  
+  scoreDisplay.textContent = `Votre score : ${score} / ${questions.length}`;
+  
+  feedbackDisplay.textContent =
+    score === questions.length ? "Parfait ! Vous êtes un génie !" :
+    score >= 7 ? "Très solide. Reviens demain." :
+    score >= 4 ? "Bien joué, continue." :
+    "Courage. Reviens demain.";
 
-  scoreDisplay.textContent=`Votre score : ${score} / ${questions.length}`;
-  feedbackDisplay.textContent=
-     // --- Meme "AI brainwashed" si score < 6/10
+  // --- Meme "AI brainwashed" si score < 6/10
   const memeContainer = document.getElementById('memeContainer');
   if (score < 6) {
     memeContainer.classList.remove('hidden');
   } else {
     memeContainer.classList.add('hidden');
   }
-    score===questions.length ? "Parfait ! Vous êtes un génie !" :
-    score>=7 ? "Très solide. Reviens demain." :
-    score>=4 ? "Bien joué, continue." :
-    "Courage. Reviens demain.";
 
   // streak
   streak++;
-  localStorage.setItem('streak',streak);
-  localStorage.setItem('lastPlayed',todayKey);
+  localStorage.setItem('streak', streak);
+  localStorage.setItem('lastPlayed', todayKey);
   streakDisplay.textContent=`Streak actuel : ${streak} jours`;
  // --- Meme card (score < 6)
 const memeCard = document.getElementById("memeCard");
