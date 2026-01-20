@@ -631,7 +631,9 @@ function showResult(){
 restartBtn.onclick = async () => {
   await startGame();
 };
-startGame();
+window.addEventListener("DOMContentLoaded", () => {
+  startGame();
+});
 
 </script>
 </body>
