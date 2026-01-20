@@ -260,6 +260,10 @@
     </div>
 
 <script>
+ const perfectTokenCanvas = document.getElementById("perfectTokenCanvas");
+const shareBtn = document.getElementById("shareBtn");
+const reviewContainer = document.getElementById("reviewContainer");
+
   // ---------- TITLE ----------
   const colors=["#FF4136","#FFDC00","#2ECC40","#0074D9","#FF851B","#B10DC9"];
   const titleContainer=document.getElementById("title");
@@ -636,5 +640,19 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 </script>
+   </script>
+
+<!-- === TOKENS / SCORE === -->
+<canvas id="perfectTokenCanvas" class="hidden" width="900" height="420"></canvas>
+
+<!-- === PARTAGE === -->
+<button id="shareBtn" class="hidden">Partager sur LinkedIn</button>
+
+<!-- === REVIEW QUESTIONS === -->
+<div id="reviewContainer"></div>
+
+</body>
+</html>
+
 </body>
 </html>
