@@ -202,6 +202,22 @@
       padding:12px;border:none;border-radius:12px;
       background:#37474f;color:#fff;cursor:pointer;font-weight:900;
     }
+    /* --- 3D flip title letters --- */
+#title span{
+  display:inline-block;
+  transform-style: preserve-3d;
+  animation: titleFlip 3.6s ease-in-out infinite;
+  text-shadow:
+    0 2px 0 rgba(0,0,0,0.10),
+    0 8px 18px rgba(0,0,0,0.18);
+  will-change: transform;
+}
+
+@keyframes titleFlip{
+  0%, 82%, 100% { transform: rotateY(0deg) translateZ(0); }
+  88% { transform: rotateY(18deg) translateZ(6px); }
+  94% { transform: rotateY(-14deg) translateZ(6px); }
+}
   </style>
 </head>
 
@@ -246,6 +262,7 @@
         const s=document.createElement("span");
         s.textContent=c;
         s.style.color=colors[(colorIndex+i)%colors.length];
+        s.style.animationDelay = `${(colorIndex + i) * 0.05}s`;
         titleContainer.appendChild(s);
       });
       colorIndex += text.length;
