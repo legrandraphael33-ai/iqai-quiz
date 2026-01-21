@@ -262,16 +262,27 @@
     const parts = ["IQAI", "Test"];
     let colorIndex = 0;
 
-    function addColored(text){
-      text.split("").forEach((c,i)=>{
-        const s=document.createElement("span");
-        s.textContent=c;
-        s.style.color=colors[(colorIndex+i)%colors.length];
-        s.style.setProperty("--i", (colorIndex + i));
-        titleContainer.appendChild(s);
-      });
-      colorIndex += text.length;
-    }
+   function addColored(text){
+  text.split("").forEach((c,i)=>{
+    const s = document.createElement("span");
+    s.textContent = c;
+    s.style.opacity = "0";
+    s.style.transform = "scale(0.8)";
+    s.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+    s.style.color = colors[(colorIndex+i)%colors.length];
+
+    titleContainer.appendChild(s);
+
+    // 🎮 Effet Game Boy (allumage lettre par lettre)
+    setTimeout(() => {
+      s.style.opacity = "1";
+      s.style.transform = "scale(1)";
+    }, 180 * i); // ← ajuste ici si tu veux plus lent (200) ou plus rapide (140)
+  });
+
+  colorIndex += text.length;
+}
+
 
     titleContainer.innerHTML = "";
     addColored(parts[0]);
