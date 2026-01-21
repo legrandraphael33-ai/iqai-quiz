@@ -1,236 +1,231 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IQAI Test - I Quit AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IQAI Test - I Quit AI</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0;}
-    :root{
-      --title-font:'Press Start 2P', monospace;
-      --body-font:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-
-    body{
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:flex-start;
-      background: linear-gradient(135deg,#f0c79e,#e3a56b);
-      padding:20px;
-      font-family: var(--body-font);
-    }
-
-    h1{
-      font-family: var(--title-font);
-      font-size:2.25em;
-      margin-bottom:8px;
-      text-align:center;
-      line-height:1.15;
-      letter-spacing:0.5px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.18);
-    }
-    h1 span{display:inline-block;}
-    .title-sep{margin:0 10px;opacity:0.92;transform:translateY(-1px);}
-
-    p.subtitle{
-      text-align:center;
-      margin-bottom:24px;
-      font-size:1.45em;
-      font-weight:800;
-      color:#ffffff;
-      text-shadow:0 3px 12px rgba(0,0,0,0.28);
-      letter-spacing:0.2px;
-    }
-
-    .container{
-      max-width:560px;width:100%;
-      background:#ffffff;color:#333;
-      border-radius:18px;
-      padding:26px;
-      box-shadow:0 10px 28px rgba(0,0,0,0.18);
-    }
-
-    .question{
-      margin-bottom:14px;
-      font-weight:800;
-      font-size:1.05em;
-      line-height:1.35;
-    }
-
-    .options button{
-      margin:6px 0;
-      width:100%;
-      padding:12px 14px 12px 44px;
-      border:none;
-      border-radius:12px;
-      background:#ff8f00;
-      color:#fff;
-      cursor:pointer;
-      font-weight:800;
-      transition:0.2s;
-      position:relative;
-      text-align:left;
-      font-family:var(--body-font);
-      font-size:1em;
-    }
-    .options button:hover{background:#f57c00;}
-
-    /* Surbrillance sélection (sans indiquer vrai/faux) */
-    .options button.selected{
-      background:#263238 !important;
-      outline:3px solid rgba(255,143,0,0.55);
-      box-shadow:0 8px 18px rgba(0,0,0,0.15);
-      transform:translateY(1px);
-    }
-    .options button::before{
-      content:"";
-      position:absolute;left:12px;top:50%;
-      transform:translateY(-50%);
-      width:20px;height:20px;border-radius:6px;
-      border:2px solid rgba(255,255,255,0.85);
-      background:rgba(255,255,255,0.12);
-    }
-    .options button.selected::before{
-      content:"✓";
-      display:flex;align-items:center;justify-content:center;
-      font-weight:900;color:#fff;
-      background:rgba(255,255,255,0.25);
-    }
-
-    #nextBtn{
-      margin-top:12px;width:100%;
-      padding:12px;border:none;border-radius:12px;
-      background:#263238;color:#fff;
-      cursor:pointer;font-weight:800;
-      transition:0.2s;
-      font-family:var(--body-font);
-      font-size:1em;
-    }
-    #nextBtn:hover{filter:brightness(1.05);}
-    #nextBtn:disabled{opacity:0.55;cursor:not-allowed;}
-
-    .score,.streak,.feedback{text-align:center;margin-top:10px;}
-    .feedback{font-style:italic;color:#27ae60;font-weight:800;}
-
-    .hidden{display:none;}
-
-    /* Review + tags */
-    #reviewContainer{margin-top:18px;}
-    #reviewContainer h3{margin:8px 0 10px;font-size:1.05em;}
-    .reviewItem{
-      padding:10px 12px;
-      border:1px solid rgba(0,0,0,0.08);
-      border-radius:12px;margin-bottom:10px;
-      background:rgba(0,0,0,0.02);
-      line-height:1.35;
-      font-size:0.98em;
-    }
-
-    .answerTag{
-      display:inline-block;
-      padding:2px 8px;
-      border-radius:999px;
-      font-weight:900;
-      line-height:1.2;
-    }
-    .answerTag.ok{
-      background: rgba(39,174,96,0.12);
-      border: 1px solid rgba(39,174,96,0.35);
-      color:#1f7a3f;
-    }
-    .answerTag.bad{
-      background: rgba(255,60,120,0.14);
-      border: 1px solid rgba(255,60,120,0.40);
-      color:#a8164a;
-    }
-
-    .errorBox{
-      margin-top:10px;
-      padding:12px;
-      border-radius:12px;
-      background:#fff3f3;
-      border:1px solid rgba(255,0,0,0.15);
-      color:#8a1f1f;
-      font-weight:700;
-      line-height:1.35;
-      font-size:0.98em;
-    }
-
-    /* Token container */
-    #tokenContainer{
-      margin:20px auto 0;
-      padding:16px;
-      background:#fff;
-      border-radius:16px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.15);
-      max-width:420px;
-      text-align:center;
-    }
-    #tokenImage{
-      width:100%;
-      border-radius:12px;
-      display:block;
-    }
-    #tokenCanvas{
-      width:100%;
-      border-radius:12px;
-      display:block;
-    }
-
-    #shareBtn{
-      margin-top:16px;
-      width:100%;
-      padding:12px 16px;
-      background:#0077b5;
-      color:#fff;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:900;
-      font-size:1em;
-      transition:0.2s;
-    }
-    #shareBtn:hover{background:#005885;}
-
-    #restartBtn{
-      margin-top:12px;width:100%;
-      padding:12px;border:none;border-radius:12px;
-      background:#37474f;color:#fff;cursor:pointer;font-weight:900;
-    }
-    /* --- Boot: letters light up (one-shot) --- */
-#title span{
-  display:inline-block;
-  animation: bootLight 800ms ease-out both;
-  animation-delay: calc(var(--i) * 60ms);
-  will-change: filter, opacity, transform;
-}
-
-@keyframes bootLight{
-  0%   { opacity: 0; transform: translateY(6px) scale(0.98); filter: grayscale(1) brightness(0.2) blur(1px); }
-  60%  { opacity: 1; transform: translateY(0) scale(1); filter: grayscale(0.7) brightness(1.2); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: grayscale(0) brightness(1) blur(0); }
-}
-    @media (max-width: 480px) {
-    h1#title {
-      font-size: 1.4em;
-      white-space: nowrap;
-      transform: scale(0.95);
-    }
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --title-font:'Press Start 2P', monospace;
+    --body-font:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    background: linear-gradient(135deg,#f0c79e,#e3a56b);
+    padding:20px;
+    font-family: var(--body-font);
   }
 
-  </style>
+  h1{
+    font-family: var(--title-font);
+    font-size:2.25em;
+    margin-bottom:8px;
+    text-align:center;
+    line-height:1.15;
+    letter-spacing:0.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+    white-space: nowrap; /* évite les retours à la ligne */
+  }
+  h1 span{display:inline-block;}
+
+  .title-sep{margin:0 10px;opacity:0.92;transform:translateY(-1px);}
+
+  p.subtitle{
+    text-align:center;
+    margin-bottom:24px;
+    font-size:1.45em;
+    font-weight:800;
+    color:#ffffff;
+    text-shadow:0 3px 12px rgba(0,0,0,0.28);
+    letter-spacing:0.2px;
+  }
+
+  .container{
+    max-width:560px;width:100%;
+    background:#ffffff;color:#333;
+    border-radius:18px;
+    padding:26px;
+    box-shadow:0 10px 28px rgba(0,0,0,0.18);
+  }
+
+  .question{
+    margin-bottom:14px;
+    font-weight:800;
+    font-size:1.05em;
+    line-height:1.35;
+  }
+
+  .options button{
+    margin:6px 0;
+    width:100%;
+    padding:12px 14px 12px 44px;
+    border:none;
+    border-radius:12px;
+    background:#ff8f00;
+    color:#fff;
+    cursor:pointer;
+    font-weight:800;
+    transition:0.2s;
+    position:relative;
+    text-align:left;
+    font-family:var(--body-font);
+    font-size:1em;
+  }
+  .options button:hover{background:#f57c00;}
+
+  /* Surbrillance sélection (sans indiquer vrai/faux) */
+  .options button.selected{
+    background:#263238 !important;
+    outline:3px solid rgba(255,143,0,0.55);
+    box-shadow:0 8px 18px rgba(0,0,0,0.15);
+    transform:translateY(1px);
+  }
+  .options button::before{
+    content:"";
+    position:absolute;left:12px;top:50%;
+    transform:translateY(-50%);
+    width:20px;height:20px;border-radius:6px;
+    border:2px solid rgba(255,255,255,0.85);
+    background:rgba(255,255,255,0.12);
+  }
+  .options button.selected::before{
+    content:"✓";
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;color:#fff;
+    background:rgba(255,255,255,0.25);
+  }
+
+  #nextBtn{
+    margin-top:12px;width:100%;
+    padding:12px;border:none;border-radius:12px;
+    background:#263238;color:#fff;
+    cursor:pointer;font-weight:800;
+    transition:0.2s;
+    font-family:var(--body-font);
+    font-size:1em;
+  }
+  #nextBtn:hover{filter:brightness(1.05);}
+  #nextBtn:disabled{opacity:0.55;cursor:not-allowed;}
+
+  .score,.streak,.feedback{text-align:center;margin-top:10px;}
+  .feedback{font-style:italic;color:#27ae60;font-weight:800;}
+
+  #shareBtn{
+    margin-top:10px;padding:10px 15px;
+    background:#0077b5;color:#fff;border:none;border-radius:10px;
+    cursor:pointer;font-weight:900;
+    display:block;margin-left:auto;margin-right:auto;
+  }
+  #restartBtn{
+    margin-top:12px;width:100%;
+    padding:12px;border:none;border-radius:12px;
+    background:#37474f;color:#fff;cursor:pointer;font-weight:900;
+  }
+
+  .hidden{display:none;}
+
+  #reviewContainer{margin-top:18px;}
+  #reviewContainer h3{margin:8px 0 10px;font-size:1.05em;}
+  .reviewItem{
+    padding:10px 12px;
+    border:1px solid rgba(0,0,0,0.08);
+    border-radius:12px;margin-bottom:10px;
+    background:rgba(0,0,0,0.02);
+    line-height:1.35;
+    font-size:0.98em;
+  }
+
+  .errorBox{
+    margin-top:10px;
+    padding:12px;
+    border-radius:12px;
+    background:#fff3f3;
+    border:1px solid rgba(255,0,0,0.15);
+    color:#8a1f1f;
+    font-weight:700;
+    line-height:1.35;
+    font-size:0.98em;
+  }
+
+  /* Surbrillance review */
+  .answerTag{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:999px;
+    font-weight:900;
+    line-height:1.2;
+  }
+  .answerTag.ok{
+    background: rgba(39,174,96,0.12);
+    border: 1px solid rgba(39,174,96,0.35);
+    color:#1f7a3f;
+  }
+  .answerTag.bad{
+    background: rgba(255,60,120,0.14);
+    border: 1px solid rgba(255,60,120,0.40);
+    color:#a8164a;
+  }
+
+  /* Token styles */
+  #tokenContainer {
+    padding: 16px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+  #tokenImage {
+    display: block;
+    margin: 0 auto;
+  }
+  #shareBtn:hover { background: #005885; }
+
+  /* START screen tweaks */
+  #startBtn{
+    width:100%;
+    padding:16px;
+    font-size:1.1em;
+    font-weight:900;
+    border:none;
+    border-radius:14px;
+    background:#263238;
+    color:#fff;
+    cursor:pointer;
+    transition:0.2s;
+  }
+  #startBtn:hover{filter:brightness(1.05);}
+
+  /* Mobile title */
+  @media (max-width: 420px){
+    h1{
+      font-size:1.45em;
+      letter-spacing:0.2px;
+    }
+    .title-sep{margin:0 6px;}
+    p.subtitle{font-size:1.15em;}
+  }
+</style>
 </head>
 
 <body>
   <h1 id="title"></h1>
   <p class="subtitle">I Quit AI</p>
 
-  <div class="container">
+  <!-- START SCREEN -->
+  <div id="startScreen" class="container">
+    <h2 style="text-align:center;margin-bottom:16px;">Appuie pour démarrer</h2>
+    <button id="startBtn">▶ START</button>
+  </div>
+
+  <!-- GAME CONTAINER (hidden until START) -->
+  <div class="container hidden" id="gameContainer">
     <div id="quiz">
       <div id="questionContainer"></div>
       <div class="options" id="optionsContainer"></div>
@@ -243,369 +238,411 @@
       <p class="feedback" id="feedbackDisplay"></p>
       <p class="streak" id="streakDisplay"></p>
 
-      <!-- ✅ UN SEUL token zone (plus d'ancien token parasite) -->
-      <div id="tokenContainer" class="hidden">
-        <img id="tokenImage" class="hidden" alt="" />
+      <!-- Token container (image OU canvas selon score) -->
+      <div id="tokenContainer" class="hidden" style="margin:20px auto; text-align:center; max-width:420px;">
+        <img id="tokenImage" class="hidden" style="width:100%; border-radius:14px;" />
         <canvas id="tokenCanvas" class="hidden" width="500" height="250"></canvas>
       </div>
 
-      <button id="shareBtn" class="hidden">Partager sur LinkedIn</button>
+      <button id="shareBtn">Partager sur LinkedIn</button>
       <div id="reviewContainer"></div>
       <button id="restartBtn">Rejouer maintenant</button>
     </div>
   </div>
 
-  <script>
-    // ========= TITLE =========
-    const colors = ["#FF4136","#FFDC00","#2ECC40","#0074D9","#FF851B","#B10DC9"];
-    const titleContainer = document.getElementById("title");
-    const parts = ["IQAI", "Test"];
-    let colorIndex = 0;
+  <!-- Boot audio -->
+  <audio id="bootSound" preload="auto">
+    <source src="Gameboy.mp3" type="audio/mpeg">
+  </audio>
 
-   function addColored(text){
-  text.split("").forEach((c,i)=>{
-    const s = document.createElement("span");
-    s.textContent = c;
-    s.style.opacity = "0";
-    s.style.transform = "scale(0.8)";
-    s.style.transition = "opacity 0.4s ease, transform 0.4s ease";
-    s.style.color = colors[(colorIndex+i)%colors.length];
+<script>
+  // ---------- TITLE (GameBoy light-up) ----------
+  const colors=["#FF4136","#FFDC00","#2ECC40","#0074D9","#FF851B","#B10DC9"];
+  const titleContainer=document.getElementById("title");
+  const parts=["IQAI","Test"];
 
-    titleContainer.appendChild(s);
-
-    // 🎮 Effet Game Boy (allumage lettre par lettre)
-    setTimeout(() => {
-      s.style.opacity = "1";
-      s.style.transform = "scale(1)";
-    }, 180 * i); // ← ajuste ici si tu veux plus lent (200) ou plus rapide (140)
-  });
-
-  colorIndex += text.length;
-}
-
-
+  function clearTitle(){
     titleContainer.innerHTML = "";
-    addColored(parts[0]);
-    const sep=document.createElement("span");
-    sep.textContent=" | ";
-    sep.className="title-sep";
-    sep.style.color="rgba(255,255,255,0.92)";
-    titleContainer.appendChild(sep);
-    addColored(parts[1]);
+  }
 
-    // ========= CONFIG =========
-    const API_URL = "https://iqai-backend.vercel.app/api/quiz";
+  // allumage lettre par lettre, synchronisable au jingle
+  function animateTitle({ letterDelayMs = 140, initialDelayMs = 80 } = {}){
+    clearTitle();
 
-    // ========= STATE =========
-    let questions = [];
-    let current = 0;
-    let score = 0;
-    let userAnswers = [];
+    // construit "IQAI | Test" en spans
+    const spans = [];
 
-    // ========= DOM =========
-    const questionContainer = document.getElementById("questionContainer");
-    const optionsContainer  = document.getElementById("optionsContainer");
-    const nextBtn           = document.getElementById("nextBtn");
-    const quizDiv           = document.getElementById("quiz");
-    const resultDiv         = document.getElementById("result");
-
-    const scoreDisplay      = document.getElementById("scoreDisplay");
-    const feedbackDisplay   = document.getElementById("feedbackDisplay");
-    const streakDisplay     = document.getElementById("streakDisplay");
-
-    const tokenContainer    = document.getElementById("tokenContainer");
-    const tokenImage        = document.getElementById("tokenImage");
-    const tokenCanvas       = document.getElementById("tokenCanvas");
-
-    const shareBtn          = document.getElementById("shareBtn");
-    const restartBtn        = document.getElementById("restartBtn");
-    const reviewContainer   = document.getElementById("reviewContainer");
-    const errorContainer    = document.getElementById("errorContainer");
-
-    // ========= STREAK =========
-    const todayKey = new Date().toDateString();
-    let streak = parseInt(localStorage.getItem("streak") || "0", 10);
-    let lastPlayed = localStorage.getItem("lastPlayed");
-    if (lastPlayed !== todayKey && lastPlayed !== new Date(Date.now()-86400000).toDateString()) streak = 0;
-
-    // ========= ERRORS =========
-    function showError(msg){
-      errorContainer.classList.remove("hidden");
-      errorContainer.className = "errorBox";
-      errorContainer.textContent = msg;
-    }
-    function clearError(){
-      errorContainer.classList.add("hidden");
-      errorContainer.className = "";
-      errorContainer.textContent = "";
+    function addText(text, {isSep=false} = {}){
+      text.split("").forEach((c)=>{
+        const s=document.createElement("span");
+        s.textContent=c;
+        if(isSep){
+          s.className="title-sep";
+          s.style.color="rgba(255,255,255,0.92)";
+          s.style.opacity="1";
+          s.style.transform="translateY(-1px)";
+        } else {
+          s.style.opacity="0";
+          s.style.transform="scale(0.85)";
+          s.style.transition="opacity 180ms ease, transform 180ms ease";
+          spans.push(s);
+        }
+        titleContainer.appendChild(s);
+      });
     }
 
-    // ========= AVOID (anti-répétition) =========
-    function getAvoidList(){
-      try{
-        const raw = localStorage.getItem("iqai_avoid") || "[]";
-        const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr.slice(-60) : [];
-      }catch{
-        return [];
-      }
+    addText(parts[0]);
+    addText(" | ", {isSep:true});
+    addText(parts[1]);
+
+    // applique la couleur + reveal progressif
+    spans.forEach((s, i)=>{
+      s.style.color = colors[i % colors.length];
+      setTimeout(()=>{
+        s.style.opacity="1";
+        s.style.transform="scale(1)";
+      }, initialDelayMs + (i * letterDelayMs));
+    });
+
+    const totalMs = initialDelayMs + (spans.length * letterDelayMs) + 220;
+    return totalMs;
+  }
+
+  // ---------- STATE ----------
+  const API_URL = "https://iqai-backend.vercel.app/api/quiz";
+  let questions = [];
+  let current = 0;
+  let score = 0;
+  let userAnswers = [];
+
+  // ---------- DOM ----------
+  const questionContainer=document.getElementById('questionContainer');
+  const optionsContainer=document.getElementById('optionsContainer');
+  const nextBtn=document.getElementById('nextBtn');
+  const quizDiv=document.getElementById('quiz');
+  const resultDiv=document.getElementById('result');
+
+  const scoreDisplay=document.getElementById('scoreDisplay');
+  const feedbackDisplay=document.getElementById('feedbackDisplay');
+  const streakDisplay=document.getElementById('streakDisplay');
+
+  const shareBtn=document.getElementById('shareBtn');
+  const restartBtn=document.getElementById('restartBtn');
+  const reviewContainer=document.getElementById('reviewContainer');
+  const errorContainer=document.getElementById('errorContainer');
+
+  // Start UI
+  const startScreen = document.getElementById("startScreen");
+  const startBtn = document.getElementById("startBtn");
+  const gameContainer = document.getElementById("gameContainer");
+  const bootSound = document.getElementById("bootSound");
+
+  // ---------- STREAK ----------
+  const todayKey=new Date().toDateString();
+  let streak=parseInt(localStorage.getItem('streak')||'0');
+  let lastPlayed=localStorage.getItem('lastPlayed');
+  if(lastPlayed!==todayKey && lastPlayed!==new Date(Date.now()-86400000).toDateString()) streak=0;
+
+  // ---------- HELPERS ----------
+  function showError(msg){
+    errorContainer.classList.remove('hidden');
+    errorContainer.className = "errorBox";
+    errorContainer.textContent = msg;
+  }
+  function clearError(){
+    errorContainer.classList.add('hidden');
+    errorContainer.className = "";
+    errorContainer.textContent = "";
+  }
+
+  function normalizeQuiz(raw){
+    if(!Array.isArray(raw)) return null;
+    const arr = raw.slice(0, 10).map(x => ({
+      q: String(x.q ?? ""),
+      options: Array.isArray(x.options) ? x.options.map(String).slice(0,4) : [],
+      answer: String(x.answer ?? ""),
+      explanation: String(x.explanation ?? "")
+    })).filter(x => x.q && x.options.length === 4 && x.answer);
+    return arr.length ? arr : null;
+  }
+
+  function getAvoidList(){
+    try{
+      const raw = localStorage.getItem("iqai_avoid") || "[]";
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.slice(-60) : [];
+    }catch{
+      return [];
     }
-    function pushAvoidFromQuiz(quiz){
-      try{
-        const avoid = getAvoidList();
-        quiz.forEach(q => {
-          const txt = String(q.q || "").trim();
-          if (txt) avoid.push(txt);
-        });
-        localStorage.setItem("iqai_avoid", JSON.stringify(avoid.slice(-200)));
-      }catch{}
-    }
-
-    // ========= NORMALIZE =========
-    function normalizeQuiz(raw){
-      if (!Array.isArray(raw)) return null;
-
-      const arr = raw.slice(0, 10).map(x => ({
-        q: String(x.q ?? "").trim(),
-        options: Array.isArray(x.options) ? x.options.map(o => String(o).trim()).slice(0,4) : [],
-        answer: String(x.answer ?? "").trim(),
-        explanation: String(x.explanation ?? "").trim()
-      })).filter(x => x.q && x.options.length === 4 && x.answer);
-
-      return (arr.length === 10) ? arr : null;
-    }
-
-    // ========= LOAD =========
-    async function loadQuestions(){
+  }
+  function pushAvoidFromQuiz(quiz){
+    try{
       const avoid = getAvoidList();
-
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-        body: JSON.stringify({ avoid })
+      quiz.forEach(q => {
+        const txt = String(q.q || "").trim();
+        if(txt) avoid.push(txt);
       });
+      localStorage.setItem("iqai_avoid", JSON.stringify(avoid.slice(-200)));
+    }catch{}
+  }
 
-      if(!res.ok){
-        throw new Error("Le backend ne répond pas (HTTP " + res.status + ").");
-      }
+  async function loadQuestions(){
+    const avoid = getAvoidList();
 
-      const raw = await res.json();
-      const quiz = normalizeQuiz(raw);
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      body: JSON.stringify({ avoid })
+    });
 
-      if(!quiz || quiz.length !== 10){
-        throw new Error("Le quiz reçu est invalide. Réessaie.");
-      }
-
-      questions = quiz;
-      pushAvoidFromQuiz(quiz);
+    if(!res.ok){
+      throw new Error("Le backend ne répond pas (HTTP " + res.status + ").");
     }
 
-    // ========= UI =========
-    function showQuestion(){
-      clearError();
-      const q = questions[current];
+    const raw = await res.json();
+    const quiz = normalizeQuiz(raw);
 
-      questionContainer.innerHTML = `<div class="question">${current+1}. ${q.q}</div>`;
-      optionsContainer.innerHTML = "";
-
-      nextBtn.disabled = (userAnswers[current] == null);
-      nextBtn.textContent = (current === questions.length - 1) ? "Terminer" : "Suivant";
-
-      q.options.forEach(opt=>{
-        const btn = document.createElement("button");
-        btn.textContent = opt;
-
-        if (userAnswers[current] === opt) btn.classList.add("selected");
-
-        btn.onclick = () => {
-          userAnswers[current] = opt;
-          Array.from(optionsContainer.children).forEach(b=>{
-            b.classList.toggle("selected", b.textContent === opt);
-          });
-          nextBtn.disabled = false;
-        };
-
-        optionsContainer.appendChild(btn);
-      });
+    if(!quiz || quiz.length !== 10){
+      throw new Error("Le quiz reçu est invalide. Réessaie.");
     }
 
-    nextBtn.onclick = () => {
-      const selected = userAnswers[current];
-      if (selected === questions[current].answer) score++;
-      current++;
+    questions = quiz;
+    pushAvoidFromQuiz(quiz);
+  }
 
-      if (current < questions.length) showQuestion();
-      else showResult();
-    };
+  // ---------- QUIZ UI ----------
+  function showQuestion(){
+    clearError();
+    const q=questions[current];
+    questionContainer.innerHTML=`<div class="question">${current+1}. ${q.q}</div>`;
+    optionsContainer.innerHTML='';
+    nextBtn.disabled = (userAnswers[current] == null);
 
-    // ========= TOKENS =========
-    function drawMidToken(score){
-      const ctx = tokenCanvas.getContext("2d");
-      ctx.clearRect(0,0,500,250);
+    q.options.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.textContent=opt;
 
-      const grad = ctx.createLinearGradient(0,0,500,250);
+      if(userAnswers[current]===opt) btn.classList.add('selected');
+
+      btn.onclick=()=>{
+        userAnswers[current]=opt;
+        Array.from(optionsContainer.children).forEach(b=>{
+          b.classList.toggle('selected', b.textContent===opt);
+        });
+        nextBtn.disabled=false;
+      };
+
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  nextBtn.onclick=()=>{
+    const selected=userAnswers[current];
+    if(selected===questions[current].answer) score++;
+    current++;
+
+    if(current<questions.length){
+      showQuestion();
+    } else {
+      showResult();
+    }
+  };
+
+  function showResult(){
+    quizDiv.classList.add('hidden');
+    resultDiv.classList.remove('hidden');
+
+    scoreDisplay.textContent = `Votre score : ${score} / ${questions.length}`;
+
+    feedbackDisplay.textContent =
+      score === questions.length ? "Parfait ! Vous êtes un génie !" :
+      score >= 7 ? "Très solide. Reviens demain." :
+      score >= 4 ? "Bien joué, continue." :
+      "Courage. Reviens demain.";
+
+    // Streak
+    streak++;
+    localStorage.setItem('streak', streak);
+    localStorage.setItem('lastPlayed', todayKey);
+    streakDisplay.textContent = `Streak actuel : ${streak} jours`;
+
+    // ========== TOKENS ==========
+    const tokenContainer = document.getElementById('tokenContainer');
+    const tokenImage = document.getElementById('tokenImage');
+    const tokenCanvas = document.getElementById('tokenCanvas');
+
+    // reset propre
+    tokenContainer.classList.remove('hidden');
+    tokenImage.classList.add('hidden');
+    tokenCanvas.classList.add('hidden');
+    tokenImage.src = "";
+
+    if (score < 6) {
+      tokenImage.classList.remove('hidden');
+      tokenImage.src = "./ai-brainwashed.jpg";
+      tokenImage.alt = "AI BRAINWASHED";
+
+    } else if (score < 10) {
+      tokenCanvas.classList.remove('hidden');
+      const ctx = tokenCanvas.getContext('2d');
+      ctx.clearRect(0, 0, 500, 250);
+
+      const grad = ctx.createLinearGradient(0, 0, 500, 250);
       grad.addColorStop(0, "#4facfe");
       grad.addColorStop(1, "#00f2fe");
       ctx.fillStyle = grad;
-      ctx.fillRect(0,0,500,250);
+      ctx.fillRect(0, 0, 500, 250);
 
       ctx.fillStyle = "#1a1a1a";
+      ctx.font = "bold 32px 'Press Start 2P'";
       ctx.textAlign = "center";
-      ctx.font = "bold 28px 'Press Start 2P'";
-      ctx.fillText("I QUIT AI 🚪", 250, 95);
+      ctx.fillText("I QUIT AI 🚪", 250, 100);
 
-      ctx.font = "18px 'Press Start 2P'";
-      ctx.fillText(`Score: ${score}/10`, 250, 145);
+      ctx.font = "20px 'Press Start 2P'";
+      ctx.fillText(`Score: ${score}/10`, 250, 150);
 
       ctx.font = "16px Inter";
       ctx.fillText("Keep going! 💪", 250, 190);
-    }
 
-    function drawPerfectToken(streak){
-      const ctx = tokenCanvas.getContext("2d");
-      ctx.clearRect(0,0,500,250);
+    } else {
+      tokenCanvas.classList.remove('hidden');
+      const ctx = tokenCanvas.getContext('2d');
+      ctx.clearRect(0, 0, 500, 250);
 
-      const grad = ctx.createLinearGradient(0,0,500,250);
+      const grad = ctx.createLinearGradient(0, 0, 500, 250);
       grad.addColorStop(0, "#f7d24c");
       grad.addColorStop(1, "#ff9f1a");
       ctx.fillStyle = grad;
-      ctx.fillRect(0,0,500,250);
+      ctx.fillRect(0, 0, 500, 250);
 
       ctx.fillStyle = "rgba(0,0,0,0.1)";
       ctx.beginPath();
-      ctx.arc(420, 70, 50, 0, Math.PI*2);
+      ctx.arc(420, 70, 50, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = "#1f2a30";
+      ctx.font = "bold 28px 'Press Start 2P'";
       ctx.textAlign = "center";
-      ctx.font = "bold 26px 'Press Start 2P'";
       ctx.fillText("🏆 CERTIFIED 🏆", 250, 80);
 
-      ctx.font = "bold 22px 'Press Start 2P'";
+      ctx.font = "bold 24px 'Press Start 2P'";
       ctx.fillText("SAFE BRAIN", 250, 130);
 
-      ctx.font = "16px 'Press Start 2P'";
+      ctx.font = "18px 'Press Start 2P'";
       ctx.fillText(`Streak: ${streak} days`, 250, 180);
 
       ctx.font = "14px Inter";
       ctx.fillText(new Date().toLocaleDateString("fr-FR"), 250, 220);
     }
 
-    function showResult(){
-      quizDiv.classList.add("hidden");
-      resultDiv.classList.remove("hidden");
+    // ========== BOUTON LINKEDIN ==========
+    shareBtn.textContent =
+      score < 6 ? "Partage le jeu avec tes amis (et sauve-les de l'IA !)" :
+      score < 10 ? "Partage ton score et challenge tes amis !" :
+      "Partage ton cerveau certifié 100% humain !";
 
-      scoreDisplay.textContent = `Votre score : ${score} / ${questions.length}`;
-      feedbackDisplay.textContent =
-        score === questions.length ? "Parfait ! Vous êtes un génie !" :
-        score >= 7 ? "Très solide. Reviens demain." :
-        score >= 4 ? "Bien joué, continue." :
-        "Courage. Reviens demain.";
-
-      // Streak
-      streak++;
-      localStorage.setItem("streak", String(streak));
-      localStorage.setItem("lastPlayed", todayKey);
-      streakDisplay.textContent = `Streak actuel : ${streak} jours`;
-
-      // ===== TOKENS (✅ un seul token visible selon score) =====
-      tokenContainer.classList.remove("hidden");
-
-      // reset token area
-      tokenImage.classList.add("hidden");
-      tokenImage.removeAttribute("src");
-      tokenCanvas.classList.add("hidden");
-      tokenCanvas.getContext("2d").clearRect(0,0,500,250);
-
-      if (score < 6) {
-        // ✅ Michael Scott only
-        tokenImage.classList.remove("hidden");
-        tokenImage.src = "./ai-brainwashed.jpg";
-        tokenImage.alt = "AI BRAINWASHED";
-      } else if (score < 10) {
-        tokenCanvas.classList.remove("hidden");
-        drawMidToken(score);
-      } else {
-        tokenCanvas.classList.remove("hidden");
-        drawPerfectToken(streak);
-      }
-
-      // ===== Share button =====
-      shareBtn.classList.remove("hidden");
-      shareBtn.textContent =
-        score < 6 ? "Partage le jeu avec tes amis (et sauve-les de l'IA !)" :
-        score < 10 ? "Partage ton score et challenge tes amis !" :
-        "Partage ton cerveau certifié 100% humain !";
-
-      shareBtn.onclick = () => {
-        const messages = {
-          low: `🧠💥 J'ai fait ${score}/10 au IQAI Test... L'IA m'a eu ! Essaie de faire mieux : `,
-          mid: `🧠✅ Score de ${score}/10 au IQAI Test ! Je résiste à l'IA. À ton tour : `,
-          perfect: `🏆 10/10 au IQAI Test ! Cerveau 100% humain certifié. Streak: ${streak} jours. Challenge-toi : `
-        };
-        const text = score < 6 ? messages.low : score < 10 ? messages.mid : messages.perfect;
-        const url = "https://www.linkedin.com/sharing/share-offsite/?url=" +
-          encodeURIComponent(window.location.href) +
-          "&summary=" + encodeURIComponent(text);
-        window.open(url, "_blank");
+    shareBtn.onclick = () => {
+      const messages = {
+        low: `🧠💥 J'ai fait ${score}/10 au IQAI Test... L'IA m'a eu ! Essaie de faire mieux : `,
+        mid: `🧠✅ Score de ${score}/10 au IQAI Test ! Je résiste à l'IA. À ton tour : `,
+        perfect: `🏆 10/10 au IQAI Test ! Cerveau 100% humain certifié. Streak: ${streak} jours. Challenge-toi : `
       };
 
-      // ===== Review =====
-      reviewContainer.innerHTML = "<h3>Review des questions</h3>";
-      questions.forEach((q, i) => {
-        const user = userAnswers[i];
-        const isOk = (user != null && user === q.answer);
+      const text = score < 6 ? messages.low : score < 10 ? messages.mid : messages.perfect;
+      const url = "https://www.linkedin.com/sharing/share-offsite/?url=" +
+        encodeURIComponent(window.location.href) +
+        "&summary=" + encodeURIComponent(text);
 
-        const div = document.createElement("div");
-        div.className = "reviewItem";
-        div.innerHTML = `
-          <strong>Q${i+1}:</strong> ${q.q}<br>
-          <strong>Votre réponse:</strong>
-            <span class="answerTag ${isOk ? "ok" : "bad"}">${user ?? "—"}</span><br>
-          <strong>Bonne réponse:</strong>
-            <span class="answerTag ok">${q.answer}</span><br>
-          <em>Explication:</em> ${q.explanation}
-        `;
-        reviewContainer.appendChild(div);
-      });
-    }
+      window.open(url, '_blank');
+    };
 
-    // ========= START / RESTART =========
-    async function startGame(){
-      clearError();
+    // ========== REVIEW ==========
+    reviewContainer.innerHTML = "<h3>Review des questions</h3>";
 
-      // reset UI
-      resultDiv.classList.add("hidden");
-      quizDiv.classList.remove("hidden");
+    questions.forEach((q, i) => {
+      const user = userAnswers[i];
+      const isOk = (user != null && user === q.answer);
 
-      // reset token + share + review
-      tokenContainer.classList.add("hidden");
-      tokenImage.classList.add("hidden");
-      tokenImage.removeAttribute("src");
-      tokenCanvas.classList.add("hidden");
-      shareBtn.classList.add("hidden");
-      reviewContainer.innerHTML = "";
+      const div = document.createElement('div');
+      div.className = "reviewItem";
+      div.innerHTML = `
+        <strong>Q${i+1}:</strong> ${q.q}<br>
+        <strong>Votre réponse:</strong>
+          <span class="answerTag ${isOk ? "ok" : "bad"}">${user ?? "—"}</span><br>
+        <strong>Bonne réponse:</strong>
+          <span class="answerTag ok">${q.answer}</span><br>
+        <em>Explication:</em> ${q.explanation}
+      `;
+      reviewContainer.appendChild(div);
+    });
+  }
 
-      current = 0;
-      score = 0;
+  // ---------- START / RESTART ----------
+  async function startGame(){
+    clearError();
+
+    // reset UI
+    resultDiv.classList.add('hidden');
+    quizDiv.classList.remove('hidden');
+
+    reviewContainer.innerHTML="";
+
+    // reset token UI
+    const tokenContainer = document.getElementById('tokenContainer');
+    const tokenImage = document.getElementById('tokenImage');
+    const tokenCanvas = document.getElementById('tokenCanvas');
+    tokenContainer.classList.add('hidden');
+    tokenImage.classList.add('hidden');
+    tokenCanvas.classList.add('hidden');
+    tokenImage.src = "";
+
+    current = 0;
+    score = 0;
+    nextBtn.disabled = true;
+    optionsContainer.innerHTML="";
+    questionContainer.innerHTML=`<div class="question">Chargement du quiz...</div>`;
+
+    try {
+      await loadQuestions();
+      userAnswers = new Array(questions.length).fill(null);
+      showQuestion();
+    } catch (e) {
+      showError("Erreur de chargement du quiz. Recharge la page ou réessaie. (" + (e?.message || e) + ")");
+      questionContainer.innerHTML = '<div class="question">Impossible de charger le quiz.</div>';
       nextBtn.disabled = true;
-      optionsContainer.innerHTML = "";
-      questionContainer.innerHTML = `<div class="question">Chargement du quiz...</div>`;
+    }
+  }
 
-      try{
-        await loadQuestions();
-        userAnswers = new Array(questions.length).fill(null);
-        showQuestion();
-      } catch (e) {
-        showError("Erreur de chargement du quiz. Recharge la page ou réessaie. (" + (e?.message || e) + ")");
-        questionContainer.innerHTML = `<div class="question">Impossible de charger le quiz.</div>`;
-        nextBtn.disabled = true;
-      }
+  restartBtn.onclick = async () => {
+    await startGame();
+  };
+
+  // ---------- START SCREEN (sound + title sync) ----------
+  startBtn.onclick = async () => {
+    // reset title to “off” then animate with the jingle
+    const titleDurationMs = animateTitle({ letterDelayMs: 140, initialDelayMs: 80 });
+
+    try{
+      bootSound.currentTime = 0;
+      await bootSound.play();
+    }catch(e){
+      // si le son échoue, l’anim reste visible et on démarre quand même
     }
 
-    restartBtn.onclick = async () => { await startGame(); };
-    window.addEventListener("DOMContentLoaded", () => { startGame(); });
-  </script>
+    // hide start, show game after boot animation
+    startScreen.classList.add("hidden");
+    gameContainer.classList.remove("hidden");
+
+    // démarre le quiz après l’allumage des lettres (effet boot)
+    setTimeout(() => {
+      startGame();
+    }, titleDurationMs);
+  };
+
+  // Affiche le titre déjà “éteint” au chargement (optionnel).
+  // Ici, on le laisse vide et il s’allume au START.
+
+</script>
 </body>
 </html>
