@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -38,7 +36,21 @@
   }
   h1 span{display:inline-block;}
 
-  .title-sep{margin:0 10px;opacity:0.92;transform:translateY(-1px);}
+  /* La barre blanche (curseur) */
+  .title-sep{
+    margin:0 10px;
+    opacity:0;               /* invisible par défaut */
+    transform:translateY(-1px);
+    color: rgba(255,255,255,0.92);
+  }
+  .title-sep.cursor-on{
+    opacity:0.92;
+    animation: caretBlink 0.8s steps(1,end) infinite;
+  }
+  @keyframes caretBlink{
+    0%,49%{opacity:0.92;}
+    50%,100%{opacity:0;}
+  }
 
   p.subtitle{
     text-align:center;
@@ -189,20 +201,51 @@
   }
   #shareBtn:hover { background: #005885; }
 
-  /* START screen tweaks */
+  /* START screen tweaks (vintage) */
   #startBtn{
     width:100%;
     padding:16px;
-    font-size:1.1em;
+    font-size:1.05em;
     font-weight:900;
     border:none;
     border-radius:14px;
-    background:#263238;
+    background: linear-gradient(#2f3a41, #1f2a30);
     color:#fff;
     cursor:pointer;
     transition:0.2s;
+    font-family: var(--title-font);
+    letter-spacing:0.5px;
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,0.12),
+      inset 0 -3px 0 rgba(0,0,0,0.25),
+      0 10px 28px rgba(0,0,0,0.18);
+    border: 2px solid rgba(255,255,255,0.12);
+  }
+  #startBtn:active{
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,0.10),
+      inset 0 -2px 0 rgba(0,0,0,0.22),
+      0 6px 18px rgba(0,0,0,0.18);
   }
   #startBtn:hover{filter:brightness(1.05);}
+
+  /* TIMER (discret, sans toucher la DA) */
+  #timerLine{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  #timerDisplay{
+    font-family: var(--title-font);
+    font-size: 0.78em;
+    color: rgba(38,50,56,0.9);
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.06);
+    padding: 6px 10px;
+    border-radius: 999px;
+  }
 
   /* Mobile title */
   @media (max-width: 420px){
@@ -222,13 +265,17 @@
 
   <!-- START SCREEN -->
   <div id="startScreen" class="container">
-    <h2 style="text-align:center;margin-bottom:16px;">Appuie pour démarrer</h2>
+    <h2 style="text-align:center;margin-bottom:16px;font-weight:900;">Appuie pour démarrer</h2>
     <button id="startBtn">▶ START</button>
   </div>
 
   <!-- GAME CONTAINER (hidden until START) -->
   <div class="container hidden" id="gameContainer">
     <div id="quiz">
+      <div id="timerLine">
+        <div></div>
+        <div id="timerDisplay" class="hidden">⏱ 30</div>
+      </div>
       <div id="questionContainer"></div>
       <div class="options" id="optionsContainer"></div>
       <button id="nextBtn" disabled>Suivant</button>
@@ -238,7 +285,7 @@
     <div id="result" class="hidden">
       <p class="score" id="scoreDisplay"></p>
       <p class="feedback" id="feedbackDisplay"></p>
-      <p class="streak" id="streakDisplay"></p>
+      <p class="streak" id="gamesPlayedDisplay"></p>
 
       <!-- Token container (image OU canvas selon score) -->
       <div id="tokenContainer" class="hidden" style="margin:20px auto; text-align:center; max-width:420px;">
@@ -248,7 +295,7 @@
 
       <button id="shareBtn">Partager sur LinkedIn</button>
       <div id="reviewContainer"></div>
-      <button id="restartBtn">Rejouer maintenant</button>
+      <button id="restartBtn">Rejouer demain</button>
     </div>
   </div>
 
@@ -258,48 +305,57 @@
   </audio>
 
 <script>
-  // ---------- TITLE (GameBoy light-up) ----------
+  // ---------- TITLE (GameBoy light-up + cursor on last note) ----------
   const colors=["#FF4136","#FFDC00","#2ECC40","#0074D9","#FF851B","#B10DC9"];
   const titleContainer=document.getElementById("title");
   const parts=["IQAI","Test"];
 
+  let cursorSepEl = null;
+
   function clearTitle(){
     titleContainer.innerHTML = "";
+    cursorSepEl = null;
   }
 
-  // allumage lettre par lettre, synchronisable au jingle
+  function showCursorBlink(){
+    if(cursorSepEl){
+      cursorSepEl.classList.add("cursor-on");
+    }
+  }
+
+  // allumage lettre par lettre
   function animateTitle({ letterDelayMs = 140, initialDelayMs = 80 } = {}){
     clearTitle();
 
-    // construit "IQAI | Test" en spans
     const spans = [];
+    let colorIndex = 0;
 
-    function addText(text, {isSep=false} = {}){
-      text.split("").forEach((c)=>{
+    function addColoredText(text){
+      text.split("").forEach((c,i)=>{
         const s=document.createElement("span");
         s.textContent=c;
-        if(isSep){
-          s.className="title-sep";
-          s.style.color="rgba(255,255,255,0.92)";
-          s.style.opacity="1";
-          s.style.transform="translateY(-1px)";
-        } else {
-          s.style.opacity="0";
-          s.style.transform="scale(0.85)";
-          s.style.transition="opacity 180ms ease, transform 180ms ease";
-          spans.push(s);
-        }
+        s.style.opacity="0";
+        s.style.transform="scale(0.85)";
+        s.style.transition="opacity 180ms ease, transform 180ms ease";
+        s.style.color = colors[(colorIndex+i)%colors.length];
+        spans.push(s);
         titleContainer.appendChild(s);
       });
+      colorIndex += text.length;
     }
 
-    addText(parts[0]);
-    addText(" | ", {isSep:true});
-    addText(parts[1]);
+    addColoredText(parts[0]);
 
-    // applique la couleur + reveal progressif
+    // le séparateur "barre" (invisible au boot)
+    cursorSepEl = document.createElement("span");
+    cursorSepEl.id = "cursorSep";
+    cursorSepEl.className = "title-sep";
+    cursorSepEl.textContent = "|";
+    titleContainer.appendChild(cursorSepEl);
+
+    addColoredText(parts[1]);
+
     spans.forEach((s, i)=>{
-      s.style.color = colors[i % colors.length];
       setTimeout(()=>{
         s.style.opacity="1";
         s.style.transform="scale(1)";
@@ -317,6 +373,11 @@
   let score = 0;
   let userAnswers = [];
 
+  // Timer
+  const QUESTION_TIME = 30;
+  let timeLeft = QUESTION_TIME;
+  let timerId = null;
+
   // ---------- DOM ----------
   const questionContainer=document.getElementById('questionContainer');
   const optionsContainer=document.getElementById('optionsContainer');
@@ -326,12 +387,14 @@
 
   const scoreDisplay=document.getElementById('scoreDisplay');
   const feedbackDisplay=document.getElementById('feedbackDisplay');
-  const streakDisplay=document.getElementById('streakDisplay');
+  const gamesPlayedDisplay=document.getElementById('gamesPlayedDisplay');
 
   const shareBtn=document.getElementById('shareBtn');
   const restartBtn=document.getElementById('restartBtn');
   const reviewContainer=document.getElementById('reviewContainer');
   const errorContainer=document.getElementById('errorContainer');
+
+  const timerDisplay = document.getElementById("timerDisplay");
 
   // Start UI
   const startScreen = document.getElementById("startScreen");
@@ -339,11 +402,8 @@
   const gameContainer = document.getElementById("gameContainer");
   const bootSound = document.getElementById("bootSound");
 
-  // ---------- STREAK ----------
-  const todayKey=new Date().toDateString();
-  let streak=parseInt(localStorage.getItem('streak')||'0');
-  let lastPlayed=localStorage.getItem('lastPlayed');
-  if(lastPlayed!==todayKey && lastPlayed!==new Date(Date.now()-86400000).toDateString()) streak=0;
+  // ---------- GAMES PLAYED ----------
+  let gamesPlayed = parseInt(localStorage.getItem("gamesPlayed") || "0", 10);
 
   // ---------- HELPERS ----------
   function showError(msg){
@@ -388,18 +448,40 @@
     }catch{}
   }
 
+  // fetch avec timeout + retry (utile sur mobile / 4G)
+  async function fetchWithTimeout(url, options, ms){
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), ms);
+    try{
+      const res = await fetch(url, { ...options, signal: controller.signal });
+      return res;
+    } finally {
+      clearTimeout(id);
+    }
+  }
+
   async function loadQuestions(){
     const avoid = getAvoidList();
+    const payload = JSON.stringify({ avoid });
 
-    const res = await fetch(API_URL, {
+    const opts = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       cache: "no-store",
-      body: JSON.stringify({ avoid })
-    });
+      body: payload
+    };
 
-    if(!res.ok){
-      throw new Error("Le backend ne répond pas (HTTP " + res.status + ").");
+    // 1) tentative
+    let res;
+    try{
+      res = await fetchWithTimeout(API_URL, opts, 12000);
+    }catch(e){
+      // 2) retry une fois (cold start / réseau)
+      res = await fetchWithTimeout(API_URL, opts, 15000);
+    }
+
+    if(!res || !res.ok){
+      throw new Error("Le backend ne répond pas (HTTP " + (res ? res.status : "—") + ").");
     }
 
     const raw = await res.json();
@@ -411,6 +493,31 @@
 
     questions = quiz;
     pushAvoidFromQuiz(quiz);
+  }
+
+  // ---------- TIMER ----------
+  function stopTimer(){
+    if(timerId){
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
+  function startTimer(){
+    stopTimer();
+    timeLeft = QUESTION_TIME;
+    timerDisplay.classList.remove("hidden");
+    timerDisplay.textContent = `⏱ ${timeLeft}`;
+
+    timerId = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = `⏱ ${timeLeft}`;
+      if(timeLeft <= 0){
+        stopTimer();
+        // auto-next (sans réponse)
+        advanceQuestion();
+      }
+    }, 1000);
   }
 
   // ---------- QUIZ UI ----------
@@ -437,23 +544,39 @@
 
       optionsContainer.appendChild(btn);
     });
+
+    // reset timer à chaque question
+    startTimer();
+  }
+
+  function advanceQuestion(){
+    // comptage score uniquement si réponse
+    const selected=userAnswers[current];
+    if(selected != null && selected === questions[current].answer) score++;
+
+    current++;
+
+    if(current < questions.length){
+      showQuestion();
+    } else {
+      stopTimer();
+      timerDisplay.classList.add("hidden");
+      showResult();
+    }
   }
 
   nextBtn.onclick=()=>{
-    const selected=userAnswers[current];
-    if(selected===questions[current].answer) score++;
-    current++;
-
-    if(current<questions.length){
-      showQuestion();
-    } else {
-      showResult();
-    }
+    stopTimer();
+    advanceQuestion();
   };
 
   function showResult(){
     quizDiv.classList.add('hidden');
     resultDiv.classList.remove('hidden');
+
+    // +1 partie jouée
+    gamesPlayed++;
+    localStorage.setItem("gamesPlayed", String(gamesPlayed));
 
     scoreDisplay.textContent = `Votre score : ${score} / ${questions.length}`;
 
@@ -463,11 +586,7 @@
       score >= 4 ? "Bien joué, continue." :
       "Courage. Reviens demain.";
 
-    // Streak
-    streak++;
-    localStorage.setItem('streak', streak);
-    localStorage.setItem('lastPlayed', todayKey);
-    streakDisplay.textContent = `Streak actuel : ${streak} jours`;
+    gamesPlayedDisplay.textContent = `Nombre de parties jouées : ${gamesPlayed}`;
 
     // ========== TOKENS ==========
     const tokenContainer = document.getElementById('tokenContainer');
@@ -532,7 +651,7 @@
       ctx.fillText("SAFE BRAIN", 250, 130);
 
       ctx.font = "18px 'Press Start 2P'";
-      ctx.fillText(`Streak: ${streak} days`, 250, 180);
+      ctx.fillText(`Parties: ${gamesPlayed}`, 250, 180);
 
       ctx.font = "14px Inter";
       ctx.fillText(new Date().toLocaleDateString("fr-FR"), 250, 220);
@@ -548,7 +667,7 @@
       const messages = {
         low: `🧠💥 J'ai fait ${score}/10 au IQAI Test... L'IA m'a eu ! Essaie de faire mieux : `,
         mid: `🧠✅ Score de ${score}/10 au IQAI Test ! Je résiste à l'IA. À ton tour : `,
-        perfect: `🏆 10/10 au IQAI Test ! Cerveau 100% humain certifié. Streak: ${streak} jours. Challenge-toi : `
+        perfect: `🏆 10/10 au IQAI Test ! Cerveau 100% humain certifié. Parties jouées: ${gamesPlayed}. Challenge-toi : `
       };
 
       const text = score < 6 ? messages.low : score < 10 ? messages.mid : messages.perfect;
@@ -587,7 +706,6 @@
     // reset UI
     resultDiv.classList.add('hidden');
     quizDiv.classList.remove('hidden');
-
     reviewContainer.innerHTML="";
 
     // reset token UI
@@ -610,6 +728,8 @@
       userAnswers = new Array(questions.length).fill(null);
       showQuestion();
     } catch (e) {
+      stopTimer();
+      timerDisplay.classList.add("hidden");
       showError("Erreur de chargement du quiz. Recharge la page ou réessaie. (" + (e?.message || e) + ")");
       questionContainer.innerHTML = '<div class="question">Impossible de charger le quiz.</div>';
       nextBtn.disabled = true;
@@ -620,31 +740,34 @@
     await startGame();
   };
 
-  // ---------- START SCREEN (sound + title sync) ----------
+  // ---------- START SCREEN (fix mobile: démarre vraiment après click) ----------
   startBtn.onclick = async () => {
-    // reset title to “off” then animate with the jingle
+    // 1) on affiche le jeu tout de suite (sinon impression “rien ne se passe”)
+    startScreen.classList.add("hidden");
+    gameContainer.classList.remove("hidden");
+
+    // 2) on lance le quiz tout de suite (fetch immédiat)
+    startGame();
+
+    // 3) animation titre + son (en parallèle)
     const titleDurationMs = animateTitle({ letterDelayMs: 140, initialDelayMs: 80 });
 
     try{
       bootSound.currentTime = 0;
+
+      // quand le jingle finit => on affiche le curseur et il clignote
+      bootSound.onended = () => {
+        showCursorBlink();
+      };
+
       await bootSound.play();
     }catch(e){
-      // si le son échoue, l’anim reste visible et on démarre quand même
+      // si iOS bloque ou souci => on force le curseur après l’anim
+      setTimeout(() => showCursorBlink(), titleDurationMs);
     }
-
-    // hide start, show game after boot animation
-    startScreen.classList.add("hidden");
-    gameContainer.classList.remove("hidden");
-
-    // démarre le quiz après l’allumage des lettres (effet boot)
-    setTimeout(() => {
-      startGame();
-    }, titleDurationMs);
   };
 
-  // Affiche le titre déjà “éteint” au chargement (optionnel).
-  // Ici, on le laisse vide et il s’allume au START.
-
+  // au chargement, on laisse le titre éteint (il s’allume au START)
 </script>
 </body>
 </html>
