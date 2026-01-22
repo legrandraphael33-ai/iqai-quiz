@@ -19,10 +19,11 @@
       display:flex;
       flex-direction:column;
       align-items:center;
-      justify-content:flex-start;
+      justify-content:center;
       background: linear-gradient(135deg,#f0c79e,#e3a56b);
       padding:20px;
       font-family: var(--body-font);
+      overflow-x:hidden;
     }
 
     h1{
@@ -35,7 +36,21 @@
       text-shadow: 0 2px 10px rgba(0,0,0,0.18);
     }
     h1 span{display:inline-block;}
-    .title-sep{margin:0 10px;opacity:0.92;transform:translateY(-1px);}
+    .title-sep{
+      margin:0 10px;
+      opacity:0;
+      transform:translateY(-1px);
+      display:inline-block;
+      color:rgba(255,255,255,0.92);
+    }
+    .title-sep.blink{
+      animation: blink 0.8s step-end infinite;
+    }
+
+    @keyframes blink{
+      0%, 50% { opacity:1; }
+      51%, 100% { opacity:0; }
+    }
 
     p.subtitle{
       text-align:center;
@@ -55,11 +70,110 @@
       box-shadow:0 10px 28px rgba(0,0,0,0.18);
     }
 
+    /* ========== SLIDER DE DÉMARRAGE ========== */
+    #startScreen{
+      text-align:center;
+      padding:40px 20px;
+    }
+    #startScreen h2{
+      font-family: var(--title-font);
+      font-size:1.5em;
+      margin-bottom:30px;
+      color:#263238;
+      text-shadow: 2px 2px 0 rgba(255,143,0,0.3);
+    }
+
+    .slider-container{
+      position:relative;
+      width:100%;
+      max-width:400px;
+      height:70px;
+      background: linear-gradient(135deg, #263238, #37474f);
+      border-radius:40px;
+      margin:0 auto;
+      box-shadow: 
+        inset 0 4px 8px rgba(0,0,0,0.3),
+        0 4px 12px rgba(0,0,0,0.2);
+      overflow:hidden;
+      border:3px solid #ff8f00;
+    }
+
+    .slider-track{
+      position:absolute;
+      top:0;left:0;
+      width:100%;height:100%;
+      display:flex;
+      align-items:center;
+      padding:0 10px;
+      pointer-events:none;
+    }
+
+    .slider-text{
+      font-family: var(--title-font);
+      font-size:0.9em;
+      color:#ff8f00;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      margin-left:20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .slider-button{
+      position:absolute;
+      left:5px;
+      top:50%;
+      transform:translateY(-50%);
+      width:60px;
+      height:60px;
+      background: linear-gradient(135deg, #ff8f00, #f57c00);
+      border-radius:50%;
+      cursor:grab;
+      box-shadow: 0 4px 12px rgba(255,143,0,0.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.8em;
+      user-select:none;
+      touch-action:none;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .slider-button:active{
+      cursor:grabbing;
+      transform:translateY(-50%) scale(0.95);
+      box-shadow: 0 2px 8px rgba(255,143,0,0.8);
+    }
+
+    /* ========== TIMER ========== */
+    #timerDisplay{
+      position:absolute;
+      top:10px;
+      right:10px;
+      font-family: var(--title-font);
+      font-size:1.2em;
+      font-weight:900;
+      color:#27ae60;
+      background:rgba(255,255,255,0.9);
+      padding:8px 16px;
+      border-radius:20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      min-width:60px;
+      text-align:center;
+    }
+    #timerDisplay.warning{
+      color:#e74c3c;
+      animation: pulse 0.5s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%, 100% { transform:scale(1); }
+      50% { transform:scale(1.1); }
+    }
+
     .question{
       margin-bottom:14px;
       font-weight:800;
       font-size:1.05em;
       line-height:1.35;
+      padding-top:30px;
     }
 
     .options button{
@@ -80,7 +194,6 @@
     }
     .options button:hover{background:#f57c00;}
 
-    /* Surbrillance sélection (sans indiquer vrai/faux) */
     .options button.selected{
       background:#263238 !important;
       outline:3px solid rgba(255,143,0,0.55);
@@ -117,9 +230,8 @@
     .score,.streak,.feedback{text-align:center;margin-top:10px;}
     .feedback{font-style:italic;color:#27ae60;font-weight:800;}
 
-    .hidden{display:none;}
+    .hidden{display:none !important;}
 
-    /* Review + tags */
     #reviewContainer{margin-top:18px;}
     #reviewContainer h3{margin:8px 0 10px;font-size:1.05em;}
     .reviewItem{
@@ -161,7 +273,7 @@
       font-size:0.98em;
     }
 
-    /* Token container */
+    /* Token container - TAILLE RÉDUITE pour AI Brainwashed */
     #tokenContainer{
       margin:20px auto 0;
       padding:16px;
@@ -170,9 +282,13 @@
       box-shadow:0 10px 30px rgba(0,0,0,0.15);
       max-width:420px;
       text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
     #tokenImage{
-      width:100%;
+      max-width:100%;
+      height:auto;
       border-radius:12px;
       display:block;
     }
@@ -202,27 +318,23 @@
       padding:12px;border:none;border-radius:12px;
       background:#37474f;color:#fff;cursor:pointer;font-weight:900;
     }
-    /* --- Boot: letters light up (one-shot) --- */
-#title span{
-  display:inline-block;
-  animation: bootLight 800ms ease-out both;
-  animation-delay: calc(var(--i) * 60ms);
-  will-change: filter, opacity, transform;
-}
 
-@keyframes bootLight{
-  0%   { opacity: 0; transform: translateY(6px) scale(0.98); filter: grayscale(1) brightness(0.2) blur(1px); }
-  60%  { opacity: 1; transform: translateY(0) scale(1); filter: grayscale(0.7) brightness(1.2); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: grayscale(0) brightness(1) blur(0); }
-}
     @media (max-width: 480px) {
-    h1#title {
-      font-size: 1.4em;
-      white-space: nowrap;
-      transform: scale(0.95);
+      h1#title {
+        font-size: 1.4em;
+      }
+      .slider-container{
+        max-width:320px;
+        height:60px;
+      }
+      .slider-button{
+        width:50px;
+        height:50px;
+      }
+      .slider-text{
+        font-size:0.7em;
+      }
     }
-  }
-
   </style>
 </head>
 
@@ -231,19 +343,32 @@
   <p class="subtitle">I Quit AI</p>
 
   <div class="container">
-    <div id="quiz">
+    <!-- ========== ÉCRAN DE DÉMARRAGE ========== -->
+    <div id="startScreen">
+      <h2>🎮 Ready Player One? 🎮</h2>
+      <div class="slider-container" id="sliderContainer">
+        <div class="slider-track">
+          <span class="slider-text">SLIDE TO START ➤</span>
+        </div>
+        <div class="slider-button" id="sliderButton">▶</div>
+      </div>
+    </div>
+
+    <!-- ========== QUIZ ========== -->
+    <div id="quiz" class="hidden">
+      <div id="timerDisplay">30</div>
       <div id="questionContainer"></div>
       <div class="options" id="optionsContainer"></div>
       <button id="nextBtn" disabled>Suivant</button>
       <div id="errorContainer" class="hidden"></div>
     </div>
 
+    <!-- ========== RÉSULTATS ========== -->
     <div id="result" class="hidden">
       <p class="score" id="scoreDisplay"></p>
       <p class="feedback" id="feedbackDisplay"></p>
       <p class="streak" id="streakDisplay"></p>
 
-      <!-- ✅ UN SEUL token zone (plus d'ancien token parasite) -->
       <div id="tokenContainer" class="hidden">
         <img id="tokenImage" class="hidden" alt="" />
         <canvas id="tokenCanvas" class="hidden" width="500" height="250"></canvas>
@@ -256,42 +381,146 @@
   </div>
 
   <script>
-    // ========= TITLE =========
+    // ========= AUDIO =========
+    const gameboyAudio = new Audio("./Gameboy.mp3");
+    gameboyAudio.preload = "auto";
+
+    // ========= TITLE ANIMATION =========
     const colors = ["#FF4136","#FFDC00","#2ECC40","#0074D9","#FF851B","#B10DC9"];
     const titleContainer = document.getElementById("title");
     const parts = ["IQAI", "Test"];
     let colorIndex = 0;
+    let letterElements = [];
 
-   function addColored(text){
-  text.split("").forEach((c,i)=>{
-    const s = document.createElement("span");
-    s.textContent = c;
-    s.style.opacity = "0";
-    s.style.transform = "scale(0.8)";
-    s.style.transition = "opacity 0.4s ease, transform 0.4s ease";
-    s.style.color = colors[(colorIndex+i)%colors.length];
+    function buildTitle(){
+      titleContainer.innerHTML = "";
+      letterElements = [];
+      
+      // IQAI
+      parts[0].split("").forEach((c,i)=>{
+        const s = document.createElement("span");
+        s.textContent = c;
+        s.style.opacity = "0";
+        s.style.color = colors[(colorIndex+i)%colors.length];
+        titleContainer.appendChild(s);
+        letterElements.push(s);
+      });
+      colorIndex += parts[0].length;
 
-    titleContainer.appendChild(s);
+      // Séparateur
+      const sep = document.createElement("span");
+      sep.textContent = " | ";
+      sep.className = "title-sep";
+      titleContainer.appendChild(sep);
 
-    // 🎮 Effet Game Boy (allumage lettre par lettre)
-    setTimeout(() => {
-      s.style.opacity = "1";
-      s.style.transform = "scale(1)";
-    }, 180 * i); // ← ajuste ici si tu veux plus lent (200) ou plus rapide (140)
-  });
+      // Test
+      parts[1].split("").forEach((c,i)=>{
+        const s = document.createElement("span");
+        s.textContent = c;
+        s.style.opacity = "0";
+        s.style.color = colors[(colorIndex+i)%colors.length];
+        titleContainer.appendChild(s);
+        letterElements.push(s);
+      });
+    }
 
-  colorIndex += text.length;
-}
+    function animateTitle(){
+      // Durée audio Gameboy.mp3 ≈ 1.8s, on veut que les lettres s'allument progressivement
+      // puis le séparateur clignote sur la dernière note (autour de 1.6s)
+      
+      const totalLetters = letterElements.length;
+      const letterDelay = 1400 / totalLetters; // 1.4s pour allumer toutes les lettres
 
+      letterElements.forEach((el, i) => {
+        setTimeout(() => {
+          el.style.transition = "opacity 0.15s ease";
+          el.style.opacity = "1";
+        }, i * letterDelay);
+      });
 
-    titleContainer.innerHTML = "";
-    addColored(parts[0]);
-    const sep=document.createElement("span");
-    sep.textContent=" | ";
-    sep.className="title-sep";
-    sep.style.color="rgba(255,255,255,0.92)";
-    titleContainer.appendChild(sep);
-    addColored(parts[1]);
+      // Séparateur apparaît + clignote à 1.6s (dernière note du jingle)
+      setTimeout(() => {
+        const sep = document.querySelector(".title-sep");
+        sep.style.opacity = "1";
+        sep.classList.add("blink");
+      }, 1600);
+    }
+
+    buildTitle();
+
+    // ========= SLIDER =========
+    const startScreen = document.getElementById("startScreen");
+    const sliderContainer = document.getElementById("sliderContainer");
+    const sliderButton = document.getElementById("sliderButton");
+    const quizDiv = document.getElementById("quiz");
+
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    const maxSlide = sliderContainer.offsetWidth - sliderButton.offsetWidth - 10;
+
+    function startDrag(e){
+      isDragging = true;
+      startX = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
+      currentX = sliderButton.offsetLeft;
+    }
+
+    function drag(e){
+      if(!isDragging) return;
+      e.preventDefault();
+      
+      const clientX = e.type.includes("mouse") ? e.clientX : e.touches[0].clientX;
+      let deltaX = clientX - startX;
+      let newX = currentX + deltaX;
+
+      if(newX < 5) newX = 5;
+      if(newX > maxSlide) newX = maxSlide;
+
+      sliderButton.style.left = newX + "px";
+
+      // Si glissé à fond
+      if(newX >= maxSlide - 10){
+        endDrag();
+        launchGame();
+      }
+    }
+
+    function endDrag(){
+      if(!isDragging) return;
+      isDragging = false;
+      
+      // Retour au début si pas assez glissé
+      if(sliderButton.offsetLeft < maxSlide - 10){
+        sliderButton.style.transition = "left 0.3s ease";
+        sliderButton.style.left = "5px";
+        setTimeout(() => sliderButton.style.transition = "", 300);
+      }
+    }
+
+    function launchGame(){
+      // Jouer l'audio
+      gameboyAudio.currentTime = 0;
+      gameboyAudio.play().catch(e => console.warn("Audio play failed:", e));
+
+      // Animation du titre
+      animateTitle();
+
+      // Cacher l'écran de démarrage après 2s
+      setTimeout(() => {
+        startScreen.classList.add("hidden");
+        startGame();
+      }, 2000);
+    }
+
+    // Events souris
+    sliderButton.addEventListener("mousedown", startDrag);
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", endDrag);
+
+    // Events tactiles
+    sliderButton.addEventListener("touchstart", startDrag);
+    document.addEventListener("touchmove", drag, {passive:false});
+    document.addEventListener("touchend", endDrag);
 
     // ========= CONFIG =========
     const API_URL = "https://iqai-backend.vercel.app/api/quiz";
@@ -301,13 +530,15 @@
     let current = 0;
     let score = 0;
     let userAnswers = [];
+    let timerInterval = null;
+    let timeLeft = 30;
 
     // ========= DOM =========
     const questionContainer = document.getElementById("questionContainer");
     const optionsContainer  = document.getElementById("optionsContainer");
     const nextBtn           = document.getElementById("nextBtn");
-    const quizDiv           = document.getElementById("quiz");
     const resultDiv         = document.getElementById("result");
+    const timerDisplay      = document.getElementById("timerDisplay");
 
     const scoreDisplay      = document.getElementById("scoreDisplay");
     const feedbackDisplay   = document.getElementById("feedbackDisplay");
@@ -340,7 +571,7 @@
       errorContainer.textContent = "";
     }
 
-    // ========= AVOID (anti-répétition) =========
+    // ========= AVOID =========
     function getAvoidList(){
       try{
         const raw = localStorage.getItem("iqai_avoid") || "[]";
@@ -401,6 +632,46 @@
       pushAvoidFromQuiz(quiz);
     }
 
+    // ========= TIMER =========
+    function startTimer(){
+      stopTimer();
+      timeLeft = 30;
+      timerDisplay.textContent = timeLeft;
+      timerDisplay.classList.remove("warning");
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+
+        if(timeLeft <= 10){
+          timerDisplay.classList.add("warning");
+        }
+
+        if(timeLeft <= 0){
+          stopTimer();
+          autoNext();
+        }
+      }, 1000);
+    }
+
+    function stopTimer(){
+      if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerDisplay.classList.remove("warning");
+    }
+
+    function autoNext(){
+      // Temps écoulé, on passe à la suivante sans réponse
+      current++;
+      if(current < questions.length){
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
     // ========= UI =========
     function showQuestion(){
       clearError();
@@ -428,9 +699,12 @@
 
         optionsContainer.appendChild(btn);
       });
+
+      startTimer();
     }
 
     nextBtn.onclick = () => {
+      stopTimer();
       const selected = userAnswers[current];
       if (selected === questions[current].answer) score++;
       current++;
@@ -493,6 +767,7 @@
     }
 
     function showResult(){
+      stopTimer();
       quizDiv.classList.add("hidden");
       resultDiv.classList.remove("hidden");
 
@@ -509,17 +784,15 @@
       localStorage.setItem("lastPlayed", todayKey);
       streakDisplay.textContent = `Streak actuel : ${streak} jours`;
 
-      // ===== TOKENS (✅ un seul token visible selon score) =====
+      // ===== TOKENS =====
       tokenContainer.classList.remove("hidden");
 
-      // reset token area
       tokenImage.classList.add("hidden");
       tokenImage.removeAttribute("src");
       tokenCanvas.classList.add("hidden");
       tokenCanvas.getContext("2d").clearRect(0,0,500,250);
 
       if (score < 6) {
-        // ✅ Michael Scott only
         tokenImage.classList.remove("hidden");
         tokenImage.src = "./ai-brainwashed.jpg";
         tokenImage.alt = "AI BRAINWASHED";
@@ -561,51 +834,3 @@
         div.className = "reviewItem";
         div.innerHTML = `
           <strong>Q${i+1}:</strong> ${q.q}<br>
-          <strong>Votre réponse:</strong>
-            <span class="answerTag ${isOk ? "ok" : "bad"}">${user ?? "—"}</span><br>
-          <strong>Bonne réponse:</strong>
-            <span class="answerTag ok">${q.answer}</span><br>
-          <em>Explication:</em> ${q.explanation}
-        `;
-        reviewContainer.appendChild(div);
-      });
-    }
-
-    // ========= START / RESTART =========
-    async function startGame(){
-      clearError();
-
-      // reset UI
-      resultDiv.classList.add("hidden");
-      quizDiv.classList.remove("hidden");
-
-      // reset token + share + review
-      tokenContainer.classList.add("hidden");
-      tokenImage.classList.add("hidden");
-      tokenImage.removeAttribute("src");
-      tokenCanvas.classList.add("hidden");
-      shareBtn.classList.add("hidden");
-      reviewContainer.innerHTML = "";
-
-      current = 0;
-      score = 0;
-      nextBtn.disabled = true;
-      optionsContainer.innerHTML = "";
-      questionContainer.innerHTML = `<div class="question">Chargement du quiz...</div>`;
-
-      try{
-        await loadQuestions();
-        userAnswers = new Array(questions.length).fill(null);
-        showQuestion();
-      } catch (e) {
-        showError("Erreur de chargement du quiz. Recharge la page ou réessaie. (" + (e?.message || e) + ")");
-        questionContainer.innerHTML = `<div class="question">Impossible de charger le quiz.</div>`;
-        nextBtn.disabled = true;
-      }
-    }
-
-    restartBtn.onclick = async () => { await startGame(); };
-    window.addEventListener("DOMContentLoaded", () => { startGame(); });
-  </script>
-</body>
-</html>
