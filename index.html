@@ -70,6 +70,7 @@ h1 span{display:inline-block}
   position:relative;
   overflow:hidden;
   user-select:none;
+  touch-action:none;
 }
 #sliderThumb{
   height:56px;
@@ -84,6 +85,8 @@ h1 span{display:inline-block}
   position:absolute;
   left:0;
   top:0;
+  z-index:2;
+  touch-action:none;
 }
 .sliderText{
   position:absolute;
@@ -93,13 +96,11 @@ h1 span{display:inline-block}
   color:#fff;
   font-weight:900;
   opacity:.7;
+  pointer-events:none;
 }
 
 /* ===== QUIZ ===== */
-.question{
-  font-weight:800;
-  margin-bottom:12px;
-}
+.question{font-weight:800;margin-bottom:12px}
 .options button{
   width:100%;
   margin:6px 0;
@@ -110,10 +111,6 @@ h1 span{display:inline-block}
   color:#fff;
   font-weight:800;
 }
-.options button.selected{
-  background:#263238;
-}
-
 #nextBtn{
   margin-top:10px;
   width:100%;
@@ -124,33 +121,7 @@ h1 span{display:inline-block}
   color:#fff;
   font-weight:900;
 }
-
-#timer{
-  text-align:center;
-  font-weight:900;
-  margin-bottom:8px;
-}
-
-/* ===== TOKEN ===== */
-#tokenContainer{
-  margin:20px auto;
-  max-width:420px;
-  text-align:center;
-}
-#tokenImage,#tokenCanvas{
-  width:100%;
-  border-radius:14px;
-}
-
-/* ===== REVIEW ===== */
-.reviewItem{
-  margin-top:10px;
-  padding:10px;
-  border-radius:12px;
-  background:#f7f7f7;
-}
-.answerTag.ok{color:#1f7a3f;font-weight:900}
-.answerTag.bad{color:#a8164a;font-weight:900}
+#timer{text-align:center;font-weight:900;margin-bottom:8px}
 </style>
 </head>
 
@@ -175,21 +146,6 @@ h1 span{display:inline-block}
   <div id="questionContainer"></div>
   <div class="options" id="optionsContainer"></div>
   <button id="nextBtn" disabled>Suivant</button>
-</div>
-
-<!-- ===== RESULT ===== -->
-<div id="result" class="hidden">
-  <p id="scoreDisplay"></p>
-  <p id="feedbackDisplay"></p>
-  <p id="streakDisplay"></p>
-
-  <div id="tokenContainer" class="hidden">
-    <img id="tokenImage" class="hidden">
-    <canvas id="tokenCanvas" class="hidden" width="500" height="250"></canvas>
-  </div>
-
-  <button id="shareBtn">Partager</button>
-  <div id="reviewContainer"></div>
 </div>
 
 <audio id="bootAudio" src="Gameboy.mp3" preload="auto"></audio>
@@ -217,19 +173,11 @@ function playBootTitle(){
   title.innerHTML="";
   colorIndex=0;
   addColored(parts[0]);
-
   const sep=document.createElement("span");
   sep.textContent=" | ";
-  sep.className="title-sep";
-  sep.style.opacity="0";
+  sep.className="title-sep cursor";
   title.appendChild(sep);
-
   addColored(parts[1]);
-
-  setTimeout(()=>{
-    sep.style.opacity="1";
-    sep.classList.add("cursor");
-  },1800);
 }
 
 /* ===== START SLIDER ===== */
@@ -239,15 +187,17 @@ const bootAudio=document.getElementById("bootAudio");
 
 const thumb=document.getElementById("sliderThumb");
 const track=document.getElementById("sliderTrack");
-let dragging=false,startX=0;
 
-thumb.onpointerdown=e=>{
+let dragging=false;
+let startX=0;
+
+thumb.addEventListener("pointerdown",e=>{
   dragging=true;
   startX=e.clientX;
   thumb.setPointerCapture(e.pointerId);
-};
+});
 
-document.onpointermove=e=>{
+document.addEventListener("pointermove",e=>{
   if(!dragging)return;
   const dx=e.clientX-startX;
   const max=track.clientWidth-thumb.clientWidth;
@@ -257,93 +207,22 @@ document.onpointermove=e=>{
     dragging=false;
     startGame();
   }
-};
+});
 
-document.onpointerup=()=>{
-  if(dragging){
-    dragging=false;
-    thumb.style.transform="translateX(0)";
-  }
-};
+document.addEventListener("pointerup",()=>{
+  if(!dragging)return;
+  dragging=false;
+  thumb.style.transform="translateX(0)";
+});
 
 /* ===== START GAME ===== */
-async function startGame(){
+function startGame(){
   startScreen.classList.add("hidden");
   quiz.classList.remove("hidden");
-
   playBootTitle();
-  try{bootAudio.currentTime=0;await bootAudio.play()}catch{}
-
-  await loadQuestions();
-  showQuestion();
-}
-
-/* ===== QUIZ LOGIC (inchangé sauf timer) ===== */
-const API_URL="https://iqai-backend.vercel.app/api/quiz";
-let questions=[],current=0,score=0,userAnswers=[];
-let timeLeft=30,timerInterval=null;
-
-async function loadQuestions(){
-  const res=await fetch(API_URL,{method:"POST"});
-  questions=await res.json();
-}
-
-function startTimer(){
-  clearInterval(timerInterval);
-  timeLeft=30;
-  updateTimer();
-  timerInterval=setInterval(()=>{
-    timeLeft--;
-    updateTimer();
-    if(timeLeft<=0){
-      clearInterval(timerInterval);
-      nextBtn.click();
-    }
-  },1000);
-}
-
-function updateTimer(){
-  timer.textContent=`⏱ ${timeLeft}s`;
-}
-
-const questionContainer=document.getElementById("questionContainer");
-const optionsContainer=document.getElementById("optionsContainer");
-const nextBtn=document.getElementById("nextBtn");
-const timer=document.getElementById("timer");
-
-function showQuestion(){
-  const q=questions[current];
-  questionContainer.textContent=q.q;
-  optionsContainer.innerHTML="";
-  nextBtn.disabled=true;
-
-  q.options.forEach(opt=>{
-    const b=document.createElement("button");
-    b.textContent=opt;
-    b.onclick=()=>{
-      userAnswers[current]=opt;
-      nextBtn.disabled=false;
-    };
-    optionsContainer.appendChild(b);
-  });
-
-  startTimer();
-}
-
-nextBtn.onclick=()=>{
-  clearInterval(timerInterval);
-  if(userAnswers[current]===questions[current].answer)score++;
-  current++;
-  current<questions.length?showQuestion():showResult();
-};
-
-/* ===== RESULT ===== */
-function showResult(){
-  quiz.classList.add("hidden");
-  result.classList.remove("hidden");
-
-  scoreDisplay.textContent=`Votre score : ${score}/10`;
+  try{bootAudio.currentTime=0;bootAudio.play()}catch{}
 }
 </script>
+
 </body>
 </html>
