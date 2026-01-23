@@ -526,15 +526,23 @@ let hasShownCursor = false;
     timeLeft = QUESTION_TIME;
     timerDisplay.classList.remove("hidden");
     timerDisplay.textContent = `⏱ ${timeLeft}`;
+   timerDisplay.classList.remove("timer-urgent");
 
     timerId = setInterval(() => {
       timeLeft--;
-      timerDisplay.textContent = `⏱ ${timeLeft}`;
-      if(timeLeft <= 0){
-        stopTimer();
-        // auto-next (sans réponse)
-        advanceQuestion();
-      }
+timerDisplay.textContent = `⏱ ${timeLeft}`;
+
+if (timeLeft <= 10) {
+  timerDisplay.classList.add("timer-urgent");
+} else {
+  timerDisplay.classList.remove("timer-urgent");
+}
+
+if(timeLeft <= 0){
+  stopTimer();
+  advanceQuestion();
+}
+
     }, 1000);
   }
 
