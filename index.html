@@ -238,14 +238,25 @@
     margin-bottom:10px;
   }
   #timerDisplay{
-    font-family: var(--title-font);
-    font-size: 0.78em;
-    color: rgba(38,50,56,0.9);
-    background: rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.06);
-    padding: 6px 10px;
-    border-radius: 999px;
-  }
+  font-family: var(--title-font);
+  font-size: 0.82em;
+  color: #1f2a30;
+
+  background: rgba(255, 143, 0, 0.18);            /* orange vintage léger */
+  border: 2px solid rgba(255, 143, 0, 0.45);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.35);
+
+  padding: 7px 12px;
+  border-radius: 999px;
+}
+
+/* quand il reste 10s ou moins */
+#timerDisplay.timer-urgent{
+  background: rgba(255, 60, 120, 0.16);
+  border-color: rgba(255, 60, 120, 0.55);
+  color: #a8164a;
+}
+
 
   /* Mobile title */
   @media (max-width: 420px){
