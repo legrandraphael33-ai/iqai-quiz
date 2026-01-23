@@ -311,17 +311,30 @@
   const parts=["IQAI","Test"];
 
   let cursorSepEl = null;
+ let cursorTimeoutId = null;
+let hasShownCursor = false;
+
 
   function clearTitle(){
-    titleContainer.innerHTML = "";
-    cursorSepEl = null;
+  titleContainer.innerHTML = "";
+  cursorSepEl = null;
+
+  hasShownCursor = false;
+
+  if (cursorTimeoutId) {
+    clearTimeout(cursorTimeoutId);
+    cursorTimeoutId = null;
   }
+}
+
 
   function showCursorBlink(){
-    if(cursorSepEl){
-      cursorSepEl.classList.add("cursor-on");
-    }
+  if (hasShownCursor) return;
+  if (cursorSepEl){
+    cursorSepEl.classList.add("cursor-on");
+    hasShownCursor = true;
   }
+}
 
   // allumage lettre par lettre
   function animateTitle({ letterDelayMs = 140, initialDelayMs = 80 } = {}){
