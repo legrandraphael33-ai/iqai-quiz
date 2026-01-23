@@ -735,33 +735,29 @@
   };
 
   // ---------- START SCREEN (fix mobile: démarre vraiment après click) ----------
-  startBtn.onclick = async () => {
-    // 1) on affiche le jeu tout de suite (sinon impression “rien ne se passe”)
-    startScreen.classList.add("hidden");
-    gameContainer.classList.remove("hidden");
+ startBtn.onclick = async () => {
+  // 1) afficher l’UI immédiatement
+  startScreen.classList.add("hidden");
+  gameContainer.classList.remove("hidden");
 
-    // 2) on lance le quiz tout de suite (fetch immédiat)
-    startGame();
+  // 2) LANCER LE SON EN PREMIER (obligatoire iOS)
+  bootSound.onended = () => showCursorBlink();
+  try {
+    bootSound.currentTime = 0;
+    const p = bootSound.play(); // doit être appelé DIRECTEMENT dans le click
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch(e) {}
 
-    // 3) animation titre + son (en parallèle)
-    const titleDurationMs = animateTitle({ letterDelayMs: 140, initialDelayMs: 80 });
+  // 3) animation du titre ensuite
+  const titleDurationMs = animateTitle({ letterDelayMs: 140, initialDelayMs: 80 });
 
-    try{
-      bootSound.currentTime = 0;
+  // 4) sécurité : afficher le curseur même si le son ne part pas
+  setTimeout(() => showCursorBlink(), titleDurationMs + 150);
 
-      // quand le jingle finit => on affiche le curseur et il clignote
-      bootSound.onended = () => {
-        showCursorBlink();
-      };
+  // 5) seulement APRÈS on lance le quiz (fetch réseau)
+  startGame();
+};
 
-      await bootSound.play();
-    }catch(e){
-      // si iOS bloque ou souci => on force le curseur après l’anim
-      setTimeout(() => showCursorBlink(), titleDurationMs);
-    }
-  };
-
-  // au chargement, on laisse le titre éteint (il s’allume au START)
 </script>
 </body>
 </html>
