@@ -195,6 +195,13 @@
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   }
+ #tokenCanvas{
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;          /* centrage horizontal */
+}
+
   #tokenImage {
     display: block;
     margin: 0 auto;
@@ -299,7 +306,7 @@
       <p class="streak" id="gamesPlayedDisplay"></p>
 
       <!-- Token container (image OU canvas selon score) -->
-      <div id="tokenContainer" class="hidden" style="margin:20px auto; text-align:center; max-width:420px;">
+      <div id="tokenContainer" class="hidden" style="margin:20px auto; text-align:center; max-width:420px; width:100%;">
         <img id="tokenImage" class="hidden" style="width:100%; border-radius:14px;" />
         <canvas id="tokenCanvas" class="hidden" width="500" height="250"></canvas>
       </div>
