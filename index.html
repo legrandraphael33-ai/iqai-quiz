@@ -266,6 +266,26 @@
   color: #a8164a;
 }
 
+ /* Bouton "J’ai un doute" */
+#doubtBtn{
+  margin-top:10px;
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:2px dashed rgba(255,143,0,0.8);
+  background:#fff3e0;
+  font-weight:900;
+  cursor:pointer;
+  font-family: var(--body-font);
+}
+#doubtBtn:active{
+  transform: translateY(1px);
+}
+#doubtBtn:disabled{
+  opacity:0.55;
+  cursor:not-allowed;
+}
+
 
   /* Mobile title */
   @media (max-width: 420px){
@@ -299,6 +319,7 @@
       <div id="questionContainer"></div>
       <div class="options" id="optionsContainer"></div>
       <button id="nextBtn" disabled>Suivant</button>
+     <button id="doubtBtn" class="hidden">🤔 J’ai un doute</button>
       <div id="errorContainer" class="hidden"></div>
     </div>
 
