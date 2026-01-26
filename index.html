@@ -315,6 +315,7 @@
 
     <div id="result" class="hidden">
       <p class="score" id="scoreDisplay"></p>
+     <p class="streak" id="vigilanceDisplay"></p>
       <p class="feedback" id="feedbackDisplay"></p>
       <p class="streak" id="gamesPlayedDisplay"></p>
 
@@ -419,6 +420,7 @@
   const scoreDisplay=document.getElementById('scoreDisplay');
   const feedbackDisplay=document.getElementById('feedbackDisplay');
   const gamesPlayedDisplay=document.getElementById('gamesPlayedDisplay');
+ const vigilanceDisplay = document.getElementById('vigilanceDisplay');
 
   const shareBtn=document.getElementById('shareBtn');
   const restartBtn=document.getElementById('restartBtn');
@@ -602,11 +604,12 @@
     const totalHalu = questions.filter(q=>q.kind==="halu").length;
 
     scoreDisplay.textContent = `Votre score : ${score} / ${questions.length - totalHalu}`;
+   if (vigilanceDisplay) {
+  vigilanceDisplay.textContent = `Vigilance IA : ${vigilance} / ${totalHalu}`;
+}
 
-    const vigLine=document.createElement("p");
-    vigLine.className="streak";
-    vigLine.textContent = `Vigilance IA : ${vigilance} / ${totalHalu}`;
-    scoreDisplay.insertAdjacentElement("afterend", vigLine);
+
+   
 
     feedbackDisplay.textContent =
       score >= 7 ? "Très solide. Reviens demain." :
@@ -623,10 +626,19 @@
     const tokenImage=document.getElementById('tokenImage');
     const tokenCanvas=document.getElementById('tokenCanvas');
 
-    tokenContainer.classList.remove('hidden');
-    tokenImage.classList.add('hidden');
-    tokenCanvas.classList.add('hidden');
-    tokenImage.src="";
+    // reset infaillible (évite image + canvas en même temps + ancien dessin qui reste)
+tokenContainer.classList.remove('hidden');
+
+tokenImage.classList.add('hidden');
+tokenImage.src = "";
+tokenImage.alt = "";
+
+tokenCanvas.classList.add('hidden');
+
+// clear canvas même s'il est caché
+const ctx0 = tokenCanvas.getContext('2d');
+ctx0.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
+
 
     // on garde ta logique visuelle sur score global (safe only)
     if (score < 6) {
