@@ -198,10 +198,22 @@
   }
 
 #tokenContainer{
-  padding: 12px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+  /* centre le bloc dans la page */
+  margin: 16px auto;
+  display: block;
+
+  /* largeur maîtrisée */
+  width: min(420px, 100%);
+  padding: 12px;
+
+  /* empêche le contenu de dépasser */
+  overflow: hidden;
+}
+
 
   max-width: 360px;
   width: 100%;
@@ -219,13 +231,14 @@
     height:auto;
     margin:0 auto;
   }
- #tokenImage{
+#tokenImage{
   display: block;
   width: 100%;
-  max-height: 220px;
-  object-fit: cover;
+  height: auto;
   border-radius: 14px;
+  object-fit: cover;
 }
+
 
 
   #shareBtn:hover { background: #005885; }
