@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IQAI Test - I Quit AI</title>
- <link rel="icon" href="data:,">
-
+<link rel="icon" href="data:,">
 
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -34,14 +33,13 @@
     line-height:1.15;
     letter-spacing:0.5px;
     text-shadow: 0 2px 10px rgba(0,0,0,0.18);
-    white-space: nowrap; /* évite les retours à la ligne */
+    white-space: nowrap;
   }
   h1 span{display:inline-block;}
 
-  /* La barre blanche (curseur) */
   .title-sep{
     margin:0 10px;
-    opacity:0;               /* invisible par défaut */
+    opacity:0;
     transform:translateY(-1px);
     color: rgba(255,255,255,0.92);
   }
@@ -97,7 +95,6 @@
   }
   .options button:hover{background:#f57c00;}
 
-  /* Surbrillance sélection (sans indiquer vrai/faux) */
   .options button.selected{
     background:#263238 !important;
     outline:3px solid rgba(255,143,0,0.55);
@@ -171,7 +168,6 @@
     font-size:0.98em;
   }
 
-  /* Surbrillance review */
   .answerTag{
     display:inline-block;
     padding:2px 8px;
@@ -190,27 +186,35 @@
     color:#a8164a;
   }
 
-  /* Token styles */
+  /* HALU tag */
+  .haluBanner{
+    margin-top:8px;
+    padding:8px 10px;
+    border-radius:12px;
+    font-weight:900;
+    background: rgba(255, 60, 120, 0.12);
+    border: 1px solid rgba(255, 60, 120, 0.35);
+    color:#a8164a;
+  }
+
   #tokenContainer {
     padding: 16px;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   }
- #tokenCanvas{
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: 0 auto;          /* centrage horizontal */
-}
-
-  #tokenImage {
-    display: block;
-    margin: 0 auto;
+  #tokenCanvas{
+    display:block;
+    max-width:100%;
+    height:auto;
+    margin:0 auto;
+  }
+  #tokenImage{
+    display:block;
+    margin:0 auto;
   }
   #shareBtn:hover { background: #005885; }
 
-  /* START screen tweaks (vintage) */
   #startBtn{
     width:100%;
     padding:16px;
@@ -239,7 +243,6 @@
   }
   #startBtn:hover{filter:brightness(1.05);}
 
-  /* TIMER (discret, sans toucher la DA) */
   #timerLine{
     display:flex;
     justify-content:space-between;
@@ -247,52 +250,38 @@
     margin-bottom:10px;
   }
   #timerDisplay{
-  font-family: var(--title-font);
-  font-size: 0.82em;
-  color: #1f2a30;
+    font-family: var(--title-font);
+    font-size: 0.82em;
+    color: #1f2a30;
+    background: rgba(255, 143, 0, 0.18);
+    border: 2px solid rgba(255, 143, 0, 0.45);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.35);
+    padding: 7px 12px;
+    border-radius: 999px;
+  }
+  #timerDisplay.timer-urgent{
+    background: rgba(255, 60, 120, 0.16);
+    border-color: rgba(255, 60, 120, 0.55);
+    color: #a8164a;
+  }
 
-  background: rgba(255, 143, 0, 0.18);            /* orange vintage léger */
-  border: 2px solid rgba(255, 143, 0, 0.45);
-  box-shadow: inset 0 2px 0 rgba(255,255,255,0.35);
+  /* Bouton "J’ai un doute" */
+  #doubtBtn{
+    margin-top:10px;
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:2px dashed rgba(255,143,0,0.8);
+    background:#fff3e0;
+    font-weight:900;
+    cursor:pointer;
+    font-family: var(--body-font);
+  }
+  #doubtBtn:active{transform: translateY(1px);}
+  #doubtBtn:disabled{opacity:0.55;cursor:not-allowed;}
 
-  padding: 7px 12px;
-  border-radius: 999px;
-}
-
-/* quand il reste 10s ou moins */
-#timerDisplay.timer-urgent{
-  background: rgba(255, 60, 120, 0.16);
-  border-color: rgba(255, 60, 120, 0.55);
-  color: #a8164a;
-}
-
- /* Bouton "J’ai un doute" */
-#doubtBtn{
-  margin-top:10px;
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:2px dashed rgba(255,143,0,0.8);
-  background:#fff3e0;
-  font-weight:900;
-  cursor:pointer;
-  font-family: var(--body-font);
-}
-#doubtBtn:active{
-  transform: translateY(1px);
-}
-#doubtBtn:disabled{
-  opacity:0.55;
-  cursor:not-allowed;
-}
-
-
-  /* Mobile title */
   @media (max-width: 420px){
-    h1{
-      font-size:1.45em;
-      letter-spacing:0.2px;
-    }
+    h1{font-size:1.45em;letter-spacing:0.2px;}
     .title-sep{margin:0 6px;}
     p.subtitle{font-size:1.15em;}
   }
@@ -303,23 +292,24 @@
   <h1 id="title"></h1>
   <p class="subtitle">I Quit AI</p>
 
-  <!-- START SCREEN -->
   <div id="startScreen" class="container">
     <h2 style="text-align:center;margin-bottom:16px;font-weight:900;">Appuie pour démarrer</h2>
     <button id="startBtn">▶ START</button>
   </div>
 
-  <!-- GAME CONTAINER (hidden until START) -->
   <div class="container hidden" id="gameContainer">
     <div id="quiz">
       <div id="timerLine">
         <div></div>
         <div id="timerDisplay" class="hidden">⏱ 30</div>
       </div>
+
       <div id="questionContainer"></div>
       <div class="options" id="optionsContainer"></div>
+
       <button id="nextBtn" disabled>Suivant</button>
-     <button id="doubtBtn" class="hidden">🤔 J’ai un doute</button>
+      <button id="doubtBtn" class="hidden">🤔 J’ai un doute</button>
+
       <div id="errorContainer" class="hidden"></div>
     </div>
 
@@ -328,7 +318,6 @@
       <p class="feedback" id="feedbackDisplay"></p>
       <p class="streak" id="gamesPlayedDisplay"></p>
 
-      <!-- Token container (image OU canvas selon score) -->
       <div id="tokenContainer" class="hidden" style="margin:20px auto; text-align:center; max-width:420px; width:100%;">
         <img id="tokenImage" class="hidden" style="width:100%; border-radius:14px;" />
         <canvas id="tokenCanvas" class="hidden" width="500" height="250"></canvas>
@@ -340,48 +329,38 @@
     </div>
   </div>
 
-  <!-- Boot audio -->
-  <audio id="bootSound" preload="auto">
+  <audio id="bootSound" preload="auto" playsinline>
     <source src="Gameboy.mp3" type="audio/mpeg">
   </audio>
 
 <script>
-  // ---------- TITLE (GameBoy light-up + cursor on last note) ----------
+  // ---------- TITLE ----------
   const colors=["#FF4136","#FFDC00","#2ECC40","#0074D9","#FF851B","#B10DC9"];
   const titleContainer=document.getElementById("title");
   const parts=["IQAI","Test"];
 
-  let cursorSepEl = null;
-
-  // anti "apparition aléatoire"
-  let cursorTimeoutId = null;
-  let hasShownCursor = false;
+  let cursorSepEl=null;
+  let cursorTimeoutId=null;
+  let hasShownCursor=false;
 
   function clearTitle(){
-    titleContainer.innerHTML = "";
-    cursorSepEl = null;
-
-    hasShownCursor = false;
-    if (cursorTimeoutId) {
-      clearTimeout(cursorTimeoutId);
-      cursorTimeoutId = null;
-    }
+    titleContainer.innerHTML="";
+    cursorSepEl=null;
+    hasShownCursor=false;
+    if(cursorTimeoutId){clearTimeout(cursorTimeoutId);cursorTimeoutId=null;}
   }
-
   function showCursorBlink(){
-    if (hasShownCursor) return;
+    if(hasShownCursor) return;
     if(cursorSepEl){
       cursorSepEl.classList.add("cursor-on");
-      hasShownCursor = true;
+      hasShownCursor=true;
     }
   }
-
-  // allumage lettre par lettre
-  function animateTitle({ letterDelayMs = 140, initialDelayMs = 80 } = {}){
+  function animateTitle({ letterDelayMs=140, initialDelayMs=80 }={}){
     clearTitle();
 
-    const spans = [];
-    let colorIndex = 0;
+    const spans=[];
+    let colorIndex=0;
 
     function addColoredText(text){
       text.split("").forEach((c,i)=>{
@@ -390,55 +369,50 @@
         s.style.opacity="0";
         s.style.transform="scale(0.85)";
         s.style.transition="opacity 180ms ease, transform 180ms ease";
-        s.style.color = colors[(colorIndex+i)%colors.length];
+        s.style.color=colors[(colorIndex+i)%colors.length];
         spans.push(s);
         titleContainer.appendChild(s);
       });
-      colorIndex += text.length;
+      colorIndex+=text.length;
     }
 
     addColoredText(parts[0]);
 
-    // le séparateur "barre" (invisible au boot)
-    cursorSepEl = document.createElement("span");
-    cursorSepEl.id = "cursorSep";
-    cursorSepEl.className = "title-sep";
-    cursorSepEl.textContent = "|";
+    cursorSepEl=document.createElement("span");
+    cursorSepEl.className="title-sep";
+    cursorSepEl.textContent="|";
     titleContainer.appendChild(cursorSepEl);
 
     addColoredText(parts[1]);
 
-    spans.forEach((s, i)=>{
+    spans.forEach((s,i)=>{
       setTimeout(()=>{
         s.style.opacity="1";
         s.style.transform="scale(1)";
-      }, initialDelayMs + (i * letterDelayMs));
+      }, initialDelayMs + (i*letterDelayMs));
     });
 
-    const totalMs = initialDelayMs + (spans.length * letterDelayMs) + 220;
-    return totalMs;
+    return initialDelayMs + (spans.length*letterDelayMs) + 220;
   }
 
   // ---------- STATE ----------
-  const API_URL = "https://iqai-backend.vercel.app/api/quiz";
-  let questions = [];
-  let current = 0;
-  let score = 0;
-  let userAnswers = [];
-
-  // "J'ai un doute" (Option B + Option 2)
-  let vigilance = 0;             // nb de hallu détectées
+  const API_URL="https://iqai-backend.vercel.app/api/quiz";
+  let questions=[];
+  let current=0;
+  let score=0;       // score "connaissance" (safe only)
+  let vigilance=0;   // score "hallu détectées"
+  let userAnswers=[];
 
   // Timer
-  const QUESTION_TIME = 30;
-  let timeLeft = QUESTION_TIME;
-  let timerId = null;
+  const QUESTION_TIME=30;
+  let timeLeft=QUESTION_TIME;
+  let timerId=null;
 
   // ---------- DOM ----------
   const questionContainer=document.getElementById('questionContainer');
   const optionsContainer=document.getElementById('optionsContainer');
   const nextBtn=document.getElementById('nextBtn');
- const doubtBtn = document.getElementById('doubtBtn');
+  const doubtBtn=document.getElementById('doubtBtn');
   const quizDiv=document.getElementById('quiz');
   const resultDiv=document.getElementById('result');
 
@@ -451,134 +425,112 @@
   const reviewContainer=document.getElementById('reviewContainer');
   const errorContainer=document.getElementById('errorContainer');
 
-  const timerDisplay = document.getElementById("timerDisplay");
+  const timerDisplay=document.getElementById("timerDisplay");
 
-  
+  const startScreen=document.getElementById("startScreen");
+  const startBtn=document.getElementById("startBtn");
+  const gameContainer=document.getElementById("gameContainer");
+  const bootSound=document.getElementById("bootSound");
 
-  // Start UI
-  const startScreen = document.getElementById("startScreen");
-  const startBtn = document.getElementById("startBtn");
-  const gameContainer = document.getElementById("gameContainer");
-  const bootSound = document.getElementById("bootSound");
-
-  // ---------- GAMES PLAYED ----------
-  let gamesPlayed = parseInt(localStorage.getItem("gamesPlayed") || "0", 10);
+  let gamesPlayed=parseInt(localStorage.getItem("gamesPlayed")||"0",10);
 
   // ---------- HELPERS ----------
   function showError(msg){
     errorContainer.classList.remove('hidden');
-    errorContainer.className = "errorBox";
-    errorContainer.textContent = msg;
+    errorContainer.className="errorBox";
+    errorContainer.textContent=msg;
   }
   function clearError(){
     errorContainer.classList.add('hidden');
-    errorContainer.className = "";
-    errorContainer.textContent = "";
+    errorContainer.className="";
+    errorContainer.textContent="";
   }
 
   function normalizeQuiz(raw){
     if(!Array.isArray(raw)) return null;
-    const arr = raw.slice(0, 10).map(x => ({
-      q: String(x.q ?? ""),
-      options: Array.isArray(x.options) ? x.options.map(String).slice(0,4) : [],
-      answer: String(x.answer ?? ""),
-      explanation: String(x.explanation ?? ""),
-      kind: String(x.kind ?? "safe") // "safe" ou "halu"
-    })).filter(x => x.q && x.options.length === 4 && x.answer);
-    return arr.length ? arr : null;
+    const arr=raw.slice(0,10).map(x=>({
+      q:String(x.q??""),
+      options:Array.isArray(x.options)?x.options.map(String).slice(0,4):[],
+      answer:String(x.answer??""),
+      explanation:String(x.explanation??""),
+      kind:String(x.kind??"safe") // "safe" ou "halu"
+    })).filter(x=>x.q && x.options.length===4 && x.answer);
+    return (arr.length===10)?arr:null;
   }
 
-  // fetch avec timeout (ne plus tuer à 12-15s)
-  async function fetchWithTimeout(url, options = {}, ms = 30000){
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), ms);
+  async function fetchWithTimeout(url, options={}, ms=30000){
+    const controller=new AbortController();
+    const id=setTimeout(()=>controller.abort(), ms);
     try{
-      return await fetch(url, { ...options, signal: controller.signal });
+      return await fetch(url,{...options, signal:controller.signal});
     } finally {
       clearTimeout(id);
     }
   }
 
   async function loadQuestions(){
-    const opts = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-      body: JSON.stringify({}) // on garde la compat POST
+    const opts={
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      cache:"no-store",
+      body: JSON.stringify({})
     };
 
-    // tentative 1 (30s)
     let res;
     try{
-      res = await fetchWithTimeout(API_URL, opts, 30000);
+      res=await fetchWithTimeout(API_URL, opts, 30000);
     }catch(e){
-      // tentative 2 (35s)
-      res = await fetchWithTimeout(API_URL, opts, 35000);
+      res=await fetchWithTimeout(API_URL, opts, 35000);
     }
 
-    if(!res || !res.ok){
-      throw new Error("Le backend ne répond pas (HTTP " + (res ? res.status : "—") + ").");
-    }
+    if(!res || !res.ok) throw new Error("Le backend ne répond pas (HTTP "+(res?res.status:"—")+").");
 
-    const raw = await res.json();
-    const quiz = normalizeQuiz(raw);
-
-    if(!quiz || quiz.length !== 10){
-      throw new Error("Le quiz reçu est invalide. Réessaie.");
-    }
-
-    questions = quiz;
+    const raw=await res.json();
+    const quiz=normalizeQuiz(raw);
+    if(!quiz) throw new Error("Quiz invalide.");
+    questions=quiz;
   }
 
   // ---------- TIMER ----------
   function stopTimer(){
-    if(timerId){
-      clearInterval(timerId);
-      timerId = null;
-    }
+    if(timerId){clearInterval(timerId);timerId=null;}
   }
-
   function startTimer(){
     stopTimer();
-    timeLeft = QUESTION_TIME;
+    timeLeft=QUESTION_TIME;
     timerDisplay.classList.remove("hidden");
-    timerDisplay.textContent = `⏱ ${timeLeft}`;
+    timerDisplay.textContent=`⏱ ${timeLeft}`;
     timerDisplay.classList.remove("timer-urgent");
 
-    timerId = setInterval(() => {
+    timerId=setInterval(()=>{
       timeLeft--;
-      timerDisplay.textContent = `⏱ ${timeLeft}`;
+      timerDisplay.textContent=`⏱ ${timeLeft}`;
 
-      if (timeLeft <= 10) {
-        timerDisplay.classList.add("timer-urgent");
-      } else {
-        timerDisplay.classList.remove("timer-urgent");
-      }
+      if(timeLeft<=10) timerDisplay.classList.add("timer-urgent");
+      else timerDisplay.classList.remove("timer-urgent");
 
-      if(timeLeft <= 0){
+      if(timeLeft<=0){
         stopTimer();
-        advanceQuestion(); // auto-next (sans réponse)
+        advanceQuestion();
       }
-    }, 1000);
+    },1000);
   }
 
   // ---------- QUIZ UI ----------
   function showQuestion(){
     clearError();
 
-    const qObj = questions[current];
-
+    const qObj=questions[current];
     questionContainer.innerHTML=`<div class="question">${current+1}. ${qObj.q}</div>`;
     optionsContainer.innerHTML='';
+
+    // bouton "Suivant" actif seulement si une option est choisie
     nextBtn.disabled = (userAnswers[current] == null);
 
-// DOUTE UI (toujours visible, utilisable illimité)
-if (doubtBtn) {
-  doubtBtn.classList.remove("hidden");
-  doubtBtn.textContent = "🤔 J’ai un doute";
-  doubtBtn.disabled = false;
-}
-
+    // afficher le bouton doute (toujours dispo en jeu)
+    doubtBtn.classList.remove("hidden");
+    doubtBtn.textContent="🤔 J’ai un doute";
+    doubtBtn.disabled=false;
 
     qObj.options.forEach(opt=>{
       const btn=document.createElement('button');
@@ -600,61 +552,45 @@ if (doubtBtn) {
     startTimer();
   }
 
- function advanceQuestion(){
-  const qObj = questions[current];
-  const selected = userAnswers[current];
-  const usedDoubt = (selected === "__DOUBT__");
+  function advanceQuestion(){
+    const qObj=questions[current];
+    const selected=userAnswers[current];
+    const usedDoubt=(selected==="__DOUBT__");
 
-  // Scoring Option 2 (anti-spam)
-  if (qObj.kind === "halu") {
-    if (usedDoubt) {
-      vigilance += 1;   // bien vu
+    // Scoring demandé :
+    // - safe + bonne réponse => +1 score
+    // - safe mauvaise => +0
+    // - hallu + doute => +1 vigilance
+    // - hallu sans doute => +0
+    if(qObj.kind==="halu"){
+      if(usedDoubt) vigilance += 1;
     } else {
-      score -= 1;       // hallucination non détectée
+      if(selected != null && selected === qObj.answer) score += 1;
     }
-  } else {
-    // safe
-    if (usedDoubt) {
-      score -= 1;       // fausse alerte
+
+    current++;
+
+    if(current < questions.length){
+      showQuestion();
     } else {
-      if (selected != null && selected === qObj.answer) score += 1;
+      stopTimer();
+      timerDisplay.classList.add("hidden");
+      showResult();
     }
   }
-
-  if (score < 0) score = 0;
-
-  current++;
-
-  if(current < questions.length){
-    showQuestion();
-  } else {
-    stopTimer();
-    timerDisplay.classList.add("hidden");
-    showResult();
-  }
-}
-
 
   nextBtn.onclick=()=>{
     stopTimer();
     advanceQuestion();
   };
 
- // Handler "J'ai un doute" (illimité)
-if (doubtBtn) {
-  doubtBtn.onclick = () => {
-    userAnswers[current] = "__DOUBT__";
+  // Doute illimité
+  doubtBtn.onclick=()=>{
+    doubtBtn.disabled=true; // anti double-tap
+    userAnswers[current]="__DOUBT__";
     stopTimer();
     advanceQuestion();
   };
-}
-
-
-      // on passe direct à la question suivante (sans répondre)
-      stopTimer();
-      advanceQuestion();
-    };
-  }
 
   function showResult(){
     quizDiv.classList.add('hidden');
@@ -663,92 +599,76 @@ if (doubtBtn) {
     gamesPlayed++;
     localStorage.setItem("gamesPlayed", String(gamesPlayed));
 
-    scoreDisplay.textContent = `Votre score : ${score} / ${questions.length}`;
+    const totalHalu = questions.filter(q=>q.kind==="halu").length;
 
-    // ligne vigilance
-    const vigLine = document.createElement("p");
-    vigLine.className = "streak";
-    vigLine.textContent = `Vigilance IA : ${vigilance} / 2`;
+    scoreDisplay.textContent = `Votre score : ${score} / ${questions.length - totalHalu}`;
+
+    const vigLine=document.createElement("p");
+    vigLine.className="streak";
+    vigLine.textContent = `Vigilance IA : ${vigilance} / ${totalHalu}`;
     scoreDisplay.insertAdjacentElement("afterend", vigLine);
 
     feedbackDisplay.textContent =
-      score === questions.length ? "Parfait ! Vous êtes un génie !" :
       score >= 7 ? "Très solide. Reviens demain." :
       score >= 4 ? "Bien joué, continue." :
       "Courage. Reviens demain.";
 
-    gamesPlayedDisplay.textContent = `Nombre de parties jouées : ${gamesPlayed}`;
+    gamesPlayedDisplay.textContent=`Nombre de parties jouées : ${gamesPlayed}`;
 
-    // cacher bouton doute en résultat
-    if (doubtBtn) doubtBtn.classList.add("hidden");
-    
+    // masquer doute sur écran résultat
+    doubtBtn.classList.add("hidden");
 
     // ========== TOKENS ==========
-    const tokenContainer = document.getElementById('tokenContainer');
-    const tokenImage = document.getElementById('tokenImage');
-    const tokenCanvas = document.getElementById('tokenCanvas');
+    const tokenContainer=document.getElementById('tokenContainer');
+    const tokenImage=document.getElementById('tokenImage');
+    const tokenCanvas=document.getElementById('tokenCanvas');
 
     tokenContainer.classList.remove('hidden');
     tokenImage.classList.add('hidden');
     tokenCanvas.classList.add('hidden');
-    tokenImage.src = "";
+    tokenImage.src="";
 
+    // on garde ta logique visuelle sur score global (safe only)
     if (score < 6) {
       tokenImage.classList.remove('hidden');
-      tokenImage.src = "./ai-brainwashed.jpg";
-      tokenImage.alt = "AI BRAINWASHED";
-
+      tokenImage.src="./ai-brainwashed.jpg";
+      tokenImage.alt="AI BRAINWASHED";
     } else if (score < 10) {
       tokenCanvas.classList.remove('hidden');
-      const ctx = tokenCanvas.getContext('2d');
-      ctx.clearRect(0, 0, 500, 250);
-
-      const grad = ctx.createLinearGradient(0, 0, 500, 250);
-      grad.addColorStop(0, "#4facfe");
-      grad.addColorStop(1, "#00f2fe");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 500, 250);
-
-      ctx.fillStyle = "#1a1a1a";
-      ctx.font = "bold 32px 'Press Start 2P'";
-      ctx.textAlign = "center";
-      ctx.fillText("I QUIT AI 🚪", 250, 100);
-
-      ctx.font = "20px 'Press Start 2P'";
-      ctx.fillText(`Score: ${score}/10`, 250, 150);
-
-      ctx.font = "16px Inter";
-      ctx.fillText("Keep going! 💪", 250, 190);
-
+      const ctx=tokenCanvas.getContext('2d');
+      ctx.clearRect(0,0,500,250);
+      const grad=ctx.createLinearGradient(0,0,500,250);
+      grad.addColorStop(0,"#4facfe");
+      grad.addColorStop(1,"#00f2fe");
+      ctx.fillStyle=grad; ctx.fillRect(0,0,500,250);
+      ctx.fillStyle="#1a1a1a";
+      ctx.font="bold 32px 'Press Start 2P'";
+      ctx.textAlign="center";
+      ctx.fillText("I QUIT AI 🚪",250,100);
+      ctx.font="20px 'Press Start 2P'";
+      ctx.fillText(`Score: ${score}/10`,250,150);
+      ctx.font="16px Inter";
+      ctx.fillText("Keep going! 💪",250,190);
     } else {
       tokenCanvas.classList.remove('hidden');
-      const ctx = tokenCanvas.getContext('2d');
-      ctx.clearRect(0, 0, 500, 250);
-
-      const grad = ctx.createLinearGradient(0, 0, 500, 250);
-      grad.addColorStop(0, "#f7d24c");
-      grad.addColorStop(1, "#ff9f1a");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 500, 250);
-
-      ctx.fillStyle = "rgba(0,0,0,0.1)";
-      ctx.beginPath();
-      ctx.arc(420, 70, 50, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#1f2a30";
-      ctx.font = "bold 28px 'Press Start 2P'";
-      ctx.textAlign = "center";
-      ctx.fillText("🏆 CERTIFIED 🏆", 250, 80);
-
-      ctx.font = "bold 24px 'Press Start 2P'";
-      ctx.fillText("SAFE BRAIN", 250, 130);
-
-      ctx.font = "18px 'Press Start 2P'";
-      ctx.fillText(`Parties: ${gamesPlayed}`, 250, 180);
-
-      ctx.font = "14px Inter";
-      ctx.fillText(new Date().toLocaleDateString("fr-FR"), 250, 220);
+      const ctx=tokenCanvas.getContext('2d');
+      ctx.clearRect(0,0,500,250);
+      const grad=ctx.createLinearGradient(0,0,500,250);
+      grad.addColorStop(0,"#f7d24c");
+      grad.addColorStop(1,"#ff9f1a");
+      ctx.fillStyle=grad; ctx.fillRect(0,0,500,250);
+      ctx.fillStyle="rgba(0,0,0,0.1)";
+      ctx.beginPath(); ctx.arc(420,70,50,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#1f2a30";
+      ctx.font="bold 28px 'Press Start 2P'";
+      ctx.textAlign="center";
+      ctx.fillText("🏆 CERTIFIED 🏆",250,80);
+      ctx.font="bold 24px 'Press Start 2P'";
+      ctx.fillText("SAFE BRAIN",250,130);
+      ctx.font="18px 'Press Start 2P'";
+      ctx.fillText(`Parties: ${gamesPlayed}`,250,180);
+      ctx.font="14px Inter";
+      ctx.fillText(new Date().toLocaleDateString("fr-FR"),250,220);
     }
 
     // ========== BOUTON LINKEDIN ==========
@@ -757,37 +677,42 @@ if (doubtBtn) {
       score < 10 ? "Partage ton score et challenge tes amis !" :
       "Partage ton cerveau certifié 100% humain !";
 
-    shareBtn.onclick = () => {
-      const messages = {
-        low: `🧠💥 J'ai fait ${score}/10 au IQAI Test... L'IA m'a eu ! Essaie de faire mieux : `,
-        mid: `🧠✅ Score de ${score}/10 au IQAI Test ! Je résiste à l'IA. À ton tour : `,
-        perfect: `🏆 10/10 au IQAI Test ! Cerveau 100% humain certifié. Parties jouées: ${gamesPlayed}. Challenge-toi : `
-      };
-
-      const text = score < 6 ? messages.low : score < 10 ? messages.mid : messages.perfect;
-      const url = "https://www.linkedin.com/sharing/share-offsite/?url=" +
+    shareBtn.onclick=()=>{
+      const text = `🧠 IQAI Test — Score: ${score}/10 | Vigilance IA: ${vigilance}/${totalHalu}. À toi de jouer : `;
+      const url="https://www.linkedin.com/sharing/share-offsite/?url=" +
         encodeURIComponent(window.location.href) +
         "&summary=" + encodeURIComponent(text);
-
-      window.open(url, '_blank');
+      window.open(url,'_blank');
     };
 
     // ========== REVIEW ==========
-    reviewContainer.innerHTML = "<h3>Review des questions</h3>";
+    reviewContainer.innerHTML="<h3>Review des questions</h3>";
 
-    questions.forEach((q, i) => {
-      const user = userAnswers[i];
-      const isOk = (user != null && user === q.answer);
+    questions.forEach((q,i)=>{
+      const user=userAnswers[i];
+      const isDoubt = (user==="__DOUBT__");
+      const isOk = (!isDoubt && user != null && user === q.answer);
 
-      const div = document.createElement('div');
-      div.className = "reviewItem";
-      div.innerHTML = `
+      let extra = "";
+      if(q.kind==="halu"){
+        extra = isDoubt
+          ? `<div class="haluBanner">🚨 ALERTE HALLU IA — Bien vu, tu ne t’es pas fait avoir !</div>`
+          : `<div class="haluBanner">🚨 ALERTE HALLU IA — L’IA t’a berné.</div>`;
+      }
+
+      const yourLabel = isDoubt ? "🤔 J’ai un doute" : (user ?? "—");
+      const yourClass = isDoubt ? "bad" : (isOk ? "ok" : "bad");
+
+      const div=document.createElement('div');
+      div.className="reviewItem";
+      div.innerHTML=`
         <strong>Q${i+1}:</strong> ${q.q}<br>
         <strong>Votre réponse:</strong>
-          <span class="answerTag ${isOk ? "ok" : "bad"}">${user ?? "—"}</span><br>
+          <span class="answerTag ${yourClass}">${yourLabel}</span><br>
         <strong>Bonne réponse:</strong>
           <span class="answerTag ok">${q.answer}</span><br>
         <em>Explication:</em> ${q.explanation}
+        ${extra}
       `;
       reviewContainer.appendChild(div);
     });
@@ -797,79 +722,62 @@ if (doubtBtn) {
   async function startGame(){
     clearError();
 
-    // reset UI
     resultDiv.classList.add('hidden');
     quizDiv.classList.remove('hidden');
     reviewContainer.innerHTML="";
 
-    // reset token UI
-    const tokenContainer = document.getElementById('tokenContainer');
-    const tokenImage = document.getElementById('tokenImage');
-    const tokenCanvas = document.getElementById('tokenCanvas');
-    tokenContainer.classList.add('hidden');
-    tokenImage.classList.add('hidden');
-    tokenCanvas.classList.add('hidden');
-    tokenImage.src = "";
-
     // reset state
-   current = 0;
-score = 0;
-vigilance = 0;
+    current=0;
+    score=0;
+    vigilance=0;
+    userAnswers=new Array(10).fill(null);
 
-    nextBtn.disabled = true;
+    nextBtn.disabled=true;
     optionsContainer.innerHTML="";
     questionContainer.innerHTML=`<div class="question">Chargement du quiz...</div>`;
 
-    // reset doubt UI
-    if (doubtBtn) {
-  doubtBtn.classList.remove("hidden");
-  doubtBtn.textContent = "🤔 J’ai un doute";
-  doubtBtn.disabled = false;
-}
+    // bouton doute caché pendant le chargement
+    doubtBtn.classList.add("hidden");
+    doubtBtn.disabled=false;
 
-
-    try {
+    try{
       await loadQuestions();
-      userAnswers = new Array(questions.length).fill(null);
       showQuestion();
-    } catch (e) {
+    }catch(e){
       stopTimer();
       timerDisplay.classList.add("hidden");
-      showError("Erreur de chargement du quiz. (" + (e?.message || e) + ")");
-      questionContainer.innerHTML = '<div class="question">Impossible de charger le quiz.</div>';
-      nextBtn.disabled = true;
+      showError("Erreur de chargement du quiz. ("+(e?.message||e)+")");
+      questionContainer.innerHTML='<div class="question">Impossible de charger le quiz.</div>';
+      nextBtn.disabled=true;
     }
   }
 
-  restartBtn.onclick = async () => {
-    await startGame();
-  };
+  restartBtn.onclick=async()=>{ await startGame(); };
 
-  // ---------- START SCREEN ----------
-  // iOS-friendly: play audio immediately on click, cursor always shown after anim
-  startBtn.onclick = () => {
+  // ---------- START SCREEN (audio iOS-friendly) ----------
+  startBtn.onclick=()=>{
     startScreen.classList.add("hidden");
     gameContainer.classList.remove("hidden");
 
-    const titleDurationMs = animateTitle({ letterDelayMs: 140, initialDelayMs: 80 });
+    const titleMs=animateTitle({ letterDelayMs: 140, initialDelayMs: 80 });
+    cursorTimeoutId=setTimeout(()=>showCursorBlink(), titleMs + 120);
 
-    cursorTimeoutId = setTimeout(() => showCursorBlink(), titleDurationMs + 150);
-
-    try {
-      bootSound.currentTime = 0;
+    // IMPORTANT : iOS => play dans le handler click, sans await
+    try{
+      bootSound.pause();
+      bootSound.currentTime=0;
       bootSound.load();
-      const p = bootSound.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
-      bootSound.onended = () => showCursorBlink();
-    } catch(e) {
-      // ignore
-    }
+
+      const p=bootSound.play();
+      if(p && typeof p.catch==="function"){
+        p.catch(()=>{/* iOS peut bloquer si silencieux etc */});
+      }
+
+      bootSound.onended=()=>showCursorBlink();
+    }catch(e){}
 
     startGame();
   };
-
-  // au chargement, on laisse le titre éteint (il s’allume au START)
 </script>
-
 </body>
 </html>
