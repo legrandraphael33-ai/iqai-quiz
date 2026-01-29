@@ -195,6 +195,7 @@
     background: rgba(255, 60, 120, 0.12);
     border: 1px solid rgba(255, 60, 120, 0.35);
     color:#a8164a;
+    line-height:1.5;
   }
 
 /* ===== TOKENS (fix canvas) ===== */
@@ -205,7 +206,7 @@
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  overflow: hidden;              /* empêche tout débordement */
+  overflow: hidden;
 }
 
 #tokenImage{
@@ -218,13 +219,10 @@
 
 #tokenCanvas{
   display:block;
-  width:100%;                    /* important */
+  width:100%;
   height:auto;
   border-radius:14px;
 }
-
-
-
 
   #shareBtn:hover { background: #005885; }
 
@@ -278,7 +276,7 @@
     color: #a8164a;
   }
 
-  /* Bouton "J’ai un doute" */
+  /* Bouton "J'ai un doute" */
   #doubtBtn{
     margin-top:10px;
     width:100%;
@@ -321,14 +319,13 @@
       <div class="options" id="optionsContainer"></div>
 
       <button id="nextBtn" disabled>Suivant</button>
-      <button id="doubtBtn" class="hidden">🤔 J’ai un doute</button>
+      <button id="doubtBtn" class="hidden">🤔 J'ai un doute</button>
 
       <div id="errorContainer" class="hidden"></div>
     </div>
 
     <div id="result" class="hidden">
       <p class="score" id="scoreDisplay"></p>
-     <p class="streak" id="vigilanceDisplay"></p>
       <p class="feedback" id="feedbackDisplay"></p>
       <p class="streak" id="gamesPlayedDisplay"></p>
 
@@ -433,7 +430,6 @@
   const scoreDisplay=document.getElementById('scoreDisplay');
   const feedbackDisplay=document.getElementById('feedbackDisplay');
   const gamesPlayedDisplay=document.getElementById('gamesPlayedDisplay');
- const vigilanceDisplay = document.getElementById('vigilanceDisplay');
 
   const shareBtn=document.getElementById('shareBtn');
   const restartBtn=document.getElementById('restartBtn');
@@ -484,11 +480,14 @@
   }
 
   async function loadQuestions(){
+    // ✅ FIX : Récupérer les questions précédentes et les envoyer dans avoid
+    const usedQuestions = JSON.parse(localStorage.getItem('usedQuestions') || '[]');
+    
     const opts={
       method:"POST",
       headers:{ "Content-Type":"application/json" },
       cache:"no-store",
-      body: JSON.stringify({})
+      body: JSON.stringify({ avoid: usedQuestions.slice(-60) }) // ← CORRECTIF ICI
     };
 
     let res;
@@ -504,6 +503,11 @@
     const quiz=normalizeQuiz(raw);
     if(!quiz) throw new Error("Quiz invalide.");
     questions=quiz;
+    
+    // ✅ FIX : Sauvegarder les nouvelles questions dans localStorage
+    const newQuestions = questions.map(q => q.q);
+    const updated = [...usedQuestions, ...newQuestions].slice(-100); // garder max 100
+    localStorage.setItem('usedQuestions', JSON.stringify(updated));
   }
 
   // ---------- TIMER ----------
@@ -544,7 +548,7 @@
 
     // afficher le bouton doute (toujours dispo en jeu)
     doubtBtn.classList.remove("hidden");
-    doubtBtn.textContent="🤔 J’ai un doute";
+    doubtBtn.textContent="🤔 J'ai un doute";
     doubtBtn.disabled=false;
 
     qObj.options.forEach(opt=>{
@@ -615,18 +619,33 @@
     localStorage.setItem("gamesPlayed", String(gamesPlayed));
 
     const totalHalu = questions.filter(q=>q.kind==="halu").length;
+    const totalSafe = questions.length - totalHalu;
+    const scoreTotal = score + vigilance;
+    const scoreMax = questions.length;
 
-    scoreDisplay.textContent = `Votre score : ${score} / ${questions.length - totalHalu}`;
-   if (vigilanceDisplay) {
-  vigilanceDisplay.textContent = `Vigilance IA : ${vigilance} / ${totalHalu}`;
-}
-
-
-   
+    // ✅ FIX : Affichage du score total en GROS + détails
+    scoreDisplay.innerHTML = `
+      <div style="font-size:2.2em; font-weight:900; margin-bottom:12px; color:#263238;">
+        🎯 ${scoreTotal} / ${scoreMax}
+      </div>
+      <div style="font-size:1em; margin-bottom:8px;">
+        📚 Questions classiques : <strong>${score} / ${totalSafe}</strong>
+      </div>
+      <div style="font-size:1em;">
+        🚨 Hallus détectées : <strong>${vigilance} / ${totalHalu}</strong>
+      </div>
+      <div style="margin-top:16px; padding:12px; background:rgba(255,143,0,0.12); border-radius:10px; font-size:0.92em; line-height:1.5;">
+        <strong>📊 Comment ça marche ?</strong><br>
+        ✅ Bonne réponse (safe) = +1 point<br>
+        ✅ Hallu détectée (doute) = +1 point<br>
+        ❌ Mauvaise réponse = 0 point<br>
+        ❌ Hallu ratée (pas de doute) = 0 point
+      </div>
+    `;
 
     feedbackDisplay.textContent =
-      score >= 7 ? "Très solide. Reviens demain." :
-      score >= 4 ? "Bien joué, continue." :
+      scoreTotal >= 8 ? "Très solide. Reviens demain." :
+      scoreTotal >= 5 ? "Bien joué, continue." :
       "Courage. Reviens demain.";
 
     gamesPlayedDisplay.textContent=`Nombre de parties jouées : ${gamesPlayed}`;
@@ -639,117 +658,108 @@
     const tokenImage=document.getElementById('tokenImage');
     const tokenCanvas=document.getElementById('tokenCanvas');
 
-    // reset infaillible (évite image + canvas en même temps + ancien dessin qui reste)
-tokenContainer.classList.remove('hidden');
+    // reset infaillible
+    tokenContainer.classList.remove('hidden');
+    tokenImage.classList.add('hidden');
+    tokenImage.src = "";
+    tokenImage.alt = "";
+    tokenCanvas.classList.add('hidden');
+    const ctx0 = tokenCanvas.getContext('2d');
+    ctx0.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
 
-tokenImage.classList.add('hidden');
-tokenImage.src = "";
-tokenImage.alt = "";
+    // on garde ta logique visuelle sur score total
+    if (scoreTotal < 6) {
+      tokenImage.classList.remove('hidden');
+      tokenImage.src = "./ai-brainwashed.jpg";
+      tokenImage.alt = "AI BRAINWASHED";
 
-tokenCanvas.classList.add('hidden');
+    } else if (scoreTotal < 10) {
+      tokenCanvas.classList.remove('hidden');
 
-// clear canvas même s'il est caché
-const ctx0 = tokenCanvas.getContext('2d');
-ctx0.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
+      const cssW = tokenContainer.clientWidth - 24;
+      const w = Math.min(520, Math.max(280, cssW));
+      const h = Math.round(w * 0.5);
 
+      const dpr = window.devicePixelRatio || 1;
+      tokenCanvas.style.width = w + "px";
+      tokenCanvas.style.height = h + "px";
+      tokenCanvas.width = Math.round(w * dpr);
+      tokenCanvas.height = Math.round(h * dpr);
 
-    // on garde ta logique visuelle sur score global (safe only)
-if (score < 6) {
-  tokenImage.classList.remove('hidden');
-  tokenImage.src = "./ai-brainwashed.jpg";
-  tokenImage.alt = "AI BRAINWASHED";
+      const ctx = tokenCanvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
 
-} else if (score < 10) {
-  tokenCanvas.classList.remove('hidden');
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, "#4facfe");
+      grad.addColorStop(1, "#00f2fe");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
 
-  // ✅ resize canvas = s'adapte au container (corrige le débordement)
-  const cssW = tokenContainer.clientWidth - 24; // padding 12*2 (si tu as mis 12px)
-  const w = Math.min(520, Math.max(280, cssW));
-  const h = Math.round(w * 0.5);
+      ctx.fillStyle = "#1a1a1a";
+      ctx.textAlign = "center";
 
-  const dpr = window.devicePixelRatio || 1;
-  tokenCanvas.style.width = w + "px";
-  tokenCanvas.style.height = h + "px";
-  tokenCanvas.width = Math.round(w * dpr);
-  tokenCanvas.height = Math.round(h * dpr);
+      ctx.font = "bold 32px 'Press Start 2P'";
+      ctx.fillText("I QUIT AI 🚪", w / 2, Math.round(h * 0.40));
 
-  const ctx = tokenCanvas.getContext("2d");
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, w, h);
+      ctx.font = "20px 'Press Start 2P'";
+      ctx.fillText(`Score: ${scoreTotal}/${scoreMax}`, w / 2, Math.round(h * 0.60));
 
-  const grad = ctx.createLinearGradient(0, 0, w, h);
-  grad.addColorStop(0, "#4facfe");
-  grad.addColorStop(1, "#00f2fe");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
+      ctx.font = "16px Inter";
+      ctx.fillText("Keep going! 💪", w / 2, Math.round(h * 0.78));
 
-  ctx.fillStyle = "#1a1a1a";
-  ctx.textAlign = "center";
+    } else {
+      tokenCanvas.classList.remove('hidden');
 
-  ctx.font = "bold 32px 'Press Start 2P'";
-  ctx.fillText("I QUIT AI 🚪", w / 2, Math.round(h * 0.40));
+      const cssW = tokenContainer.clientWidth - 24;
+      const w = Math.min(520, Math.max(280, cssW));
+      const h = Math.round(w * 0.5);
 
-  ctx.font = "20px 'Press Start 2P'";
-  ctx.fillText(`Score: ${score}/10`, w / 2, Math.round(h * 0.60));
+      const dpr = window.devicePixelRatio || 1;
+      tokenCanvas.style.width = w + "px";
+      tokenCanvas.style.height = h + "px";
+      tokenCanvas.width = Math.round(w * dpr);
+      tokenCanvas.height = Math.round(h * dpr);
 
-  ctx.font = "16px Inter";
-  ctx.fillText("Keep going! 💪", w / 2, Math.round(h * 0.78));
+      const ctx = tokenCanvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
 
-} else {
-  tokenCanvas.classList.remove('hidden');
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, "#f7d24c");
+      grad.addColorStop(1, "#ff9f1a");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
 
-  // ✅ resize canvas = s'adapte au container (corrige le débordement)
-  const cssW = tokenContainer.clientWidth - 24; // padding 12*2 (si tu as mis 12px)
-  const w = Math.min(520, Math.max(280, cssW));
-  const h = Math.round(w * 0.5);
+      ctx.fillStyle = "rgba(0,0,0,0.10)";
+      ctx.beginPath();
+      ctx.arc(Math.round(w * 0.84), Math.round(h * 0.28), Math.round(w * 0.10), 0, Math.PI * 2);
+      ctx.fill();
 
-  const dpr = window.devicePixelRatio || 1;
-  tokenCanvas.style.width = w + "px";
-  tokenCanvas.style.height = h + "px";
-  tokenCanvas.width = Math.round(w * dpr);
-  tokenCanvas.height = Math.round(h * dpr);
+      ctx.fillStyle = "#1f2a30";
+      ctx.textAlign = "center";
 
-  const ctx = tokenCanvas.getContext("2d");
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, w, h);
+      ctx.font = "bold 28px 'Press Start 2P'";
+      ctx.fillText("🏆 CERTIFIED 🏆", w / 2, Math.round(h * 0.32));
 
-  const grad = ctx.createLinearGradient(0, 0, w, h);
-  grad.addColorStop(0, "#f7d24c");
-  grad.addColorStop(1, "#ff9f1a");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
+      ctx.font = "bold 24px 'Press Start 2P'";
+      ctx.fillText("SAFE BRAIN", w / 2, Math.round(h * 0.52));
 
-  // “sun” décoratif en haut à droite, proportionnel
-  ctx.fillStyle = "rgba(0,0,0,0.10)";
-  ctx.beginPath();
-  ctx.arc(Math.round(w * 0.84), Math.round(h * 0.28), Math.round(w * 0.10), 0, Math.PI * 2);
-  ctx.fill();
+      ctx.font = "18px 'Press Start 2P'";
+      ctx.fillText(`Parties: ${gamesPlayed}`, w / 2, Math.round(h * 0.72));
 
-  ctx.fillStyle = "#1f2a30";
-  ctx.textAlign = "center";
-
-  ctx.font = "bold 28px 'Press Start 2P'";
-  ctx.fillText("🏆 CERTIFIED 🏆", w / 2, Math.round(h * 0.32));
-
-  ctx.font = "bold 24px 'Press Start 2P'";
-  ctx.fillText("SAFE BRAIN", w / 2, Math.round(h * 0.52));
-
-  ctx.font = "18px 'Press Start 2P'";
-  ctx.fillText(`Parties: ${gamesPlayed}`, w / 2, Math.round(h * 0.72));
-
-  ctx.font = "14px Inter";
-  ctx.fillText(new Date().toLocaleDateString("fr-FR"), w / 2, Math.round(h * 0.88));
-}
-
+      ctx.font = "14px Inter";
+      ctx.fillText(new Date().toLocaleDateString("fr-FR"), w / 2, Math.round(h * 0.88));
+    }
 
     // ========== BOUTON LINKEDIN ==========
     shareBtn.textContent =
-      score < 6 ? "Partage le jeu avec tes amis (et sauve-les de l'IA !)" :
-      score < 10 ? "Partage ton score et challenge tes amis !" :
+      scoreTotal < 6 ? "Partage le jeu avec tes amis (et sauve-les de l'IA !)" :
+      scoreTotal < 10 ? "Partage ton score et challenge tes amis !" :
       "Partage ton cerveau certifié 100% humain !";
 
     shareBtn.onclick=()=>{
-      const text = `🧠 IQAI Test — Score: ${score}/10 | Vigilance IA: ${vigilance}/${totalHalu}. À toi de jouer : `;
+      const text = `🧠 IQAI Test — Score: ${scoreTotal}/${scoreMax} (${score} safe + ${vigilance} hallus). À toi de jouer : `;
       const url="https://www.linkedin.com/sharing/share-offsite/?url=" +
         encodeURIComponent(window.location.href) +
         "&summary=" + encodeURIComponent(text);
@@ -764,15 +774,31 @@ if (score < 6) {
       const isDoubt = (user==="__DOUBT__");
       const isOk = (!isDoubt && user != null && user === q.answer);
 
+      // ✅ FIX : Explications claires pour les hallus
       let extra = "";
       if(q.kind==="halu"){
-        extra = isDoubt
-          ? `<div class="haluBanner">🚨 ALERTE HALLU IA — Bien vu, tu ne t’es pas fait avoir !</div>`
-          : `<div class="haluBanner">🚨 ALERTE HALLU IA — L’IA t’a berné.</div>`;
+        if(isDoubt) {
+          extra = `<div class="haluBanner">
+            🚨 <strong>ALERTE HALLU IA</strong> — Bien vu ! Tu as repéré le piège.<br>
+            <em>Cette question contenait une incohérence volontaire. Il n'y avait pas de bonne réponse.</em><br>
+            ✅ <strong>+1 point de vigilance</strong>
+          </div>`;
+        } else {
+          extra = `<div class="haluBanner">
+            🚨 <strong>ALERTE HALLU IA</strong> — L'IA t'a berné.<br>
+            <em>Cette question contenait une incohérence volontaire. Il fallait cliquer sur "J'ai un doute".</em><br>
+            ❌ <strong>0 point</strong>
+          </div>`;
+        }
       }
 
-      const yourLabel = isDoubt ? "🤔 J’ai un doute" : (user ?? "—");
+      const yourLabel = isDoubt ? "🤔 J'ai un doute" : (user ?? "—");
       const yourClass = isDoubt ? "bad" : (isOk ? "ok" : "bad");
+
+      // ✅ FIX : Pour les hallus, la "bonne réponse" est "J'ai un doute"
+      const goodAnswerText = q.kind === "halu" 
+        ? "🤔 J'ai un doute (seule réponse valide)" 
+        : q.answer;
 
       const div=document.createElement('div');
       div.className="reviewItem";
@@ -781,7 +807,7 @@ if (score < 6) {
         <strong>Votre réponse:</strong>
           <span class="answerTag ${yourClass}">${yourLabel}</span><br>
         <strong>Bonne réponse:</strong>
-          <span class="answerTag ok">${q.answer}</span><br>
+          <span class="answerTag ok">${goodAnswerText}</span><br>
         <em>Explication:</em> ${q.explanation}
         ${extra}
       `;
