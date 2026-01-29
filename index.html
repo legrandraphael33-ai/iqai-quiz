@@ -197,47 +197,32 @@
     color:#a8164a;
   }
 
+/* ===== TOKENS (fix canvas) ===== */
 #tokenContainer{
+  width: min(520px, 100%);
+  margin: 20px auto;
+  padding: 12px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-
-  /* centre le bloc dans la page */
-  margin: 16px auto;
-  display: block;
-
-  /* largeur maîtrisée */
-  width: min(420px, 100%);
-  padding: 12px;
-
-  /* empêche le contenu de dépasser */
-  overflow: hidden;
+  overflow: hidden;              /* empêche tout débordement */
 }
 
-
-  max-width: 360px;
-  width: 100%;
-  margin: 20px auto;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-  #tokenCanvas{
-    display:block;
-    max-width:100%;
-    height:auto;
-    margin:0 auto;
-  }
 #tokenImage{
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 14px;
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:14px;
   object-fit: cover;
 }
+
+#tokenCanvas{
+  display:block;
+  width:100%;                    /* important */
+  height:auto;
+  border-radius:14px;
+}
+
 
 
 
@@ -669,47 +654,93 @@ ctx0.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
 
 
     // on garde ta logique visuelle sur score global (safe only)
-    if (score < 6) {
-      tokenImage.classList.remove('hidden');
-      tokenImage.src="./ai-brainwashed.jpg";
-      tokenImage.alt="AI BRAINWASHED";
-    } else if (score < 10) {
-      tokenCanvas.classList.remove('hidden');
-      const ctx=tokenCanvas.getContext('2d');
-      ctx.clearRect(0,0,500,250);
-      const grad=ctx.createLinearGradient(0,0,500,250);
-      grad.addColorStop(0,"#4facfe");
-      grad.addColorStop(1,"#00f2fe");
-      ctx.fillStyle=grad; ctx.fillRect(0,0,500,250);
-      ctx.fillStyle="#1a1a1a";
-      ctx.font="bold 32px 'Press Start 2P'";
-      ctx.textAlign="center";
-      ctx.fillText("I QUIT AI 🚪",250,100);
-      ctx.font="20px 'Press Start 2P'";
-      ctx.fillText(`Score: ${score}/10`,250,150);
-      ctx.font="16px Inter";
-      ctx.fillText("Keep going! 💪",250,190);
-    } else {
-      tokenCanvas.classList.remove('hidden');
-      const ctx=tokenCanvas.getContext('2d');
-      ctx.clearRect(0,0,500,250);
-      const grad=ctx.createLinearGradient(0,0,500,250);
-      grad.addColorStop(0,"#f7d24c");
-      grad.addColorStop(1,"#ff9f1a");
-      ctx.fillStyle=grad; ctx.fillRect(0,0,500,250);
-      ctx.fillStyle="rgba(0,0,0,0.1)";
-      ctx.beginPath(); ctx.arc(420,70,50,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle="#1f2a30";
-      ctx.font="bold 28px 'Press Start 2P'";
-      ctx.textAlign="center";
-      ctx.fillText("🏆 CERTIFIED 🏆",250,80);
-      ctx.font="bold 24px 'Press Start 2P'";
-      ctx.fillText("SAFE BRAIN",250,130);
-      ctx.font="18px 'Press Start 2P'";
-      ctx.fillText(`Parties: ${gamesPlayed}`,250,180);
-      ctx.font="14px Inter";
-      ctx.fillText(new Date().toLocaleDateString("fr-FR"),250,220);
-    }
+if (score < 6) {
+  tokenImage.classList.remove('hidden');
+  tokenImage.src = "./ai-brainwashed.jpg";
+  tokenImage.alt = "AI BRAINWASHED";
+
+} else if (score < 10) {
+  tokenCanvas.classList.remove('hidden');
+
+  // ✅ resize canvas = s'adapte au container (corrige le débordement)
+  const cssW = tokenContainer.clientWidth - 24; // padding 12*2 (si tu as mis 12px)
+  const w = Math.min(520, Math.max(280, cssW));
+  const h = Math.round(w * 0.5);
+
+  const dpr = window.devicePixelRatio || 1;
+  tokenCanvas.style.width = w + "px";
+  tokenCanvas.style.height = h + "px";
+  tokenCanvas.width = Math.round(w * dpr);
+  tokenCanvas.height = Math.round(h * dpr);
+
+  const ctx = tokenCanvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, "#4facfe");
+  grad.addColorStop(1, "#00f2fe");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle = "#1a1a1a";
+  ctx.textAlign = "center";
+
+  ctx.font = "bold 32px 'Press Start 2P'";
+  ctx.fillText("I QUIT AI 🚪", w / 2, Math.round(h * 0.40));
+
+  ctx.font = "20px 'Press Start 2P'";
+  ctx.fillText(`Score: ${score}/10`, w / 2, Math.round(h * 0.60));
+
+  ctx.font = "16px Inter";
+  ctx.fillText("Keep going! 💪", w / 2, Math.round(h * 0.78));
+
+} else {
+  tokenCanvas.classList.remove('hidden');
+
+  // ✅ resize canvas = s'adapte au container (corrige le débordement)
+  const cssW = tokenContainer.clientWidth - 24; // padding 12*2 (si tu as mis 12px)
+  const w = Math.min(520, Math.max(280, cssW));
+  const h = Math.round(w * 0.5);
+
+  const dpr = window.devicePixelRatio || 1;
+  tokenCanvas.style.width = w + "px";
+  tokenCanvas.style.height = h + "px";
+  tokenCanvas.width = Math.round(w * dpr);
+  tokenCanvas.height = Math.round(h * dpr);
+
+  const ctx = tokenCanvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, "#f7d24c");
+  grad.addColorStop(1, "#ff9f1a");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // “sun” décoratif en haut à droite, proportionnel
+  ctx.fillStyle = "rgba(0,0,0,0.10)";
+  ctx.beginPath();
+  ctx.arc(Math.round(w * 0.84), Math.round(h * 0.28), Math.round(w * 0.10), 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#1f2a30";
+  ctx.textAlign = "center";
+
+  ctx.font = "bold 28px 'Press Start 2P'";
+  ctx.fillText("🏆 CERTIFIED 🏆", w / 2, Math.round(h * 0.32));
+
+  ctx.font = "bold 24px 'Press Start 2P'";
+  ctx.fillText("SAFE BRAIN", w / 2, Math.round(h * 0.52));
+
+  ctx.font = "18px 'Press Start 2P'";
+  ctx.fillText(`Parties: ${gamesPlayed}`, w / 2, Math.round(h * 0.72));
+
+  ctx.font = "14px Inter";
+  ctx.fillText(new Date().toLocaleDateString("fr-FR"), w / 2, Math.round(h * 0.88));
+}
+
 
     // ========== BOUTON LINKEDIN ==========
     shareBtn.textContent =
