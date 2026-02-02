@@ -8,6 +8,17 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+<!-- OneSignal Push Notifications -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "dc73bf96-dbcf-4498-ab4d-5639c66b16ea",
+    });
+  });
+</script>
+
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   :root{
@@ -131,17 +142,22 @@
   .score,.streak,.feedback{text-align:center;margin-top:10px;}
   .feedback{font-style:italic;color:#27ae60;font-weight:800;}
 
-  #shareBtn{
-    margin-top:10px;padding:10px 15px;
-    background:#0077b5;color:#fff;border:none;border-radius:10px;
-    cursor:pointer;font-weight:900;
-    display:block;margin-left:auto;margin-right:auto;
-  }
-  #restartBtn{
+  #shareBtn, #restartBtn{
     margin-top:12px;width:100%;
     padding:12px;border:none;border-radius:12px;
-    background:#37474f;color:#fff;cursor:pointer;font-weight:900;
+    cursor:pointer;font-weight:900;
+    font-size:1em;
   }
+  
+  #restartBtn{
+    background:#263238;color:#fff;
+  }
+  #restartBtn:hover{filter:brightness(1.05);}
+  
+  #shareBtn{
+    background:#0077b5;color:#fff;
+  }
+  #shareBtn:hover { background: #005885; }
 
   .hidden{display:none;}
 
@@ -186,7 +202,6 @@
     color:#a8164a;
   }
 
-  /* HALU tag */
   .haluBanner{
     margin-top:8px;
     padding:8px 10px;
@@ -198,33 +213,30 @@
     line-height:1.5;
   }
 
-/* ===== TOKENS (fix canvas) ===== */
-#tokenContainer{
-  width: min(520px, 100%);
-  margin: 20px auto;
-  padding: 12px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  overflow: hidden;
-}
+  #tokenContainer{
+    width: min(520px, 100%);
+    margin: 0 auto 16px auto;
+    padding: 10px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
 
-#tokenImage{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:14px;
-  object-fit: cover;
-}
+  #tokenImage{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:14px;
+    object-fit: cover;
+  }
 
-#tokenCanvas{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:14px;
-}
-
-  #shareBtn:hover { background: #005885; }
+  #tokenCanvas{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:14px;
+  }
 
   #startBtn{
     width:100%;
@@ -276,7 +288,6 @@
     color: #a8164a;
   }
 
-  /* Bouton "J'ai un doute" */
   #doubtBtn{
     margin-top:10px;
     width:100%;
@@ -290,6 +301,24 @@
   }
   #doubtBtn:active{transform: translateY(1px);}
   #doubtBtn:disabled{opacity:0.55;cursor:not-allowed;}
+
+  .cooldownMessage{
+    text-align:center;
+    padding:20px;
+    background:rgba(255,143,0,0.12);
+    border-radius:12px;
+    margin-top:16px;
+  }
+  .cooldownMessage h2{
+    font-size:1.5em;
+    margin-bottom:12px;
+    color:#263238;
+  }
+  .cooldownMessage p{
+    font-size:1.1em;
+    line-height:1.5;
+    color:#555;
+  }
 
   @media (max-width: 420px){
     h1{font-size:1.45em;letter-spacing:0.2px;}
@@ -325,18 +354,33 @@
     </div>
 
     <div id="result" class="hidden">
-      <p class="score" id="scoreDisplay"></p>
-      <p class="feedback" id="feedbackDisplay"></p>
-      <p class="streak" id="gamesPlayedDisplay"></p>
-
-      <div id="tokenContainer" class="hidden" >
-        <img id="tokenImage" class="hidden" style="width:100%; border-radius:14px;" />
+      <!-- TOKEN EN HAUT -->
+      <div id="tokenContainer" class="hidden">
+        <img id="tokenImage" class="hidden" />
         <canvas id="tokenCanvas" class="hidden" width="500" height="250"></canvas>
       </div>
 
-      <button id="shareBtn">Partager sur LinkedIn</button>
+      <!-- DÉTAILS DU SCORE -->
+      <div id="scoreDetails" style="text-align:center; margin-bottom:16px;"></div>
+      
+      <p class="feedback" id="feedbackDisplay"></p>
+      <p class="streak" id="gamesPlayedDisplay"></p>
+
+      <!-- BOUTONS REJOUER / PARTAGER -->
+      <button id="restartBtn">🔄 Rejouer demain</button>
+      <button id="shareBtn">📤 Partager sur LinkedIn</button>
+
+      <!-- REVIEW DES QUESTIONS -->
       <div id="reviewContainer"></div>
-      <button id="restartBtn">Rejouer demain</button>
+      
+      <!-- COMMENT ÇA MARCHE (tout en bas) -->
+      <div id="howItWorks" style="margin-top:20px; padding:12px; background:rgba(255,143,0,0.12); border-radius:10px; font-size:0.92em; line-height:1.5;">
+        <strong>📊 Comment ça marche ?</strong><br>
+        ✅ Bonne réponse (safe) = +1 point<br>
+        ✅ Hallu détectée (doute) = +1 point<br>
+        ❌ Mauvaise réponse = 0 point<br>
+        ❌ Hallu ratée (pas de doute) = 0 point
+      </div>
     </div>
   </div>
 
@@ -410,11 +454,10 @@
   const API_URL="https://iqai-backend.vercel.app/api/quiz";
   let questions=[];
   let current=0;
-  let score=0;       // score "connaissance" (safe only)
-  let vigilance=0;   // score "hallu détectées"
+  let score=0;
+  let vigilance=0;
   let userAnswers=[];
 
-  // Timer
   const QUESTION_TIME=30;
   let timeLeft=QUESTION_TIME;
   let timerId=null;
@@ -427,7 +470,7 @@
   const quizDiv=document.getElementById('quiz');
   const resultDiv=document.getElementById('result');
 
-  const scoreDisplay=document.getElementById('scoreDisplay');
+  const scoreDetails=document.getElementById('scoreDetails');
   const feedbackDisplay=document.getElementById('feedbackDisplay');
   const gamesPlayedDisplay=document.getElementById('gamesPlayedDisplay');
 
@@ -444,6 +487,33 @@
   const bootSound=document.getElementById("bootSound");
 
   let gamesPlayed=parseInt(localStorage.getItem("gamesPlayed")||"0",10);
+
+  // ---------- COOLDOWN MINUIT À MINUIT ----------
+  function checkCooldown(){
+    const lastPlayed=localStorage.getItem("lastPlayedDate");
+    if(!lastPlayed) return true;
+    
+    const lastDate=new Date(lastPlayed);
+    const now=new Date();
+    
+    // Vérifier si on est un jour différent
+    const lastDay = lastDate.toDateString();
+    const nowDay = now.toDateString();
+    
+    return lastDay !== nowDay;
+  }
+
+  function setLastPlayed(){
+    localStorage.setItem("lastPlayedDate", new Date().toISOString());
+  }
+
+  function getNextPlayTime(){
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow;
+  }
 
   // ---------- HELPERS ----------
   function showError(msg){
@@ -464,7 +534,7 @@
       options:Array.isArray(x.options)?x.options.map(String).slice(0,4):[],
       answer:String(x.answer??""),
       explanation:String(x.explanation??""),
-      kind:String(x.kind??"safe") // "safe" ou "halu"
+      kind:String(x.kind??"safe")
     })).filter(x=>x.q && x.options.length===4 && x.answer);
     return (arr.length===10)?arr:null;
   }
@@ -480,14 +550,13 @@
   }
 
   async function loadQuestions(){
-    // ✅ FIX : Récupérer les questions précédentes et les envoyer dans avoid
     const usedQuestions = JSON.parse(localStorage.getItem('usedQuestions') || '[]');
     
     const opts={
       method:"POST",
       headers:{ "Content-Type":"application/json" },
       cache:"no-store",
-      body: JSON.stringify({ avoid: usedQuestions.slice(-60) }) // ← CORRECTIF ICI
+      body: JSON.stringify({ avoid: usedQuestions.slice(-30) })
     };
 
     let res;
@@ -504,9 +573,8 @@
     if(!quiz) throw new Error("Quiz invalide.");
     questions=quiz;
     
-    // ✅ FIX : Sauvegarder les nouvelles questions dans localStorage
     const newQuestions = questions.map(q => q.q);
-    const updated = [...usedQuestions, ...newQuestions].slice(-100); // garder max 100
+    const updated = [...usedQuestions, ...newQuestions].slice(-100);
     localStorage.setItem('usedQuestions', JSON.stringify(updated));
   }
 
@@ -543,10 +611,8 @@
     questionContainer.innerHTML=`<div class="question">${current+1}. ${qObj.q}</div>`;
     optionsContainer.innerHTML='';
 
-    // bouton "Suivant" actif seulement si une option est choisie
     nextBtn.disabled = (userAnswers[current] == null);
 
-    // afficher le bouton doute (toujours dispo en jeu)
     doubtBtn.classList.remove("hidden");
     doubtBtn.textContent="🤔 J'ai un doute";
     doubtBtn.disabled=false;
@@ -576,11 +642,6 @@
     const selected=userAnswers[current];
     const usedDoubt=(selected==="__DOUBT__");
 
-    // Scoring demandé :
-    // - safe + bonne réponse => +1 score
-    // - safe mauvaise => +0
-    // - hallu + doute => +1 vigilance
-    // - hallu sans doute => +0
     if(qObj.kind==="halu"){
       if(usedDoubt) vigilance += 1;
     } else {
@@ -594,6 +655,7 @@
     } else {
       stopTimer();
       timerDisplay.classList.add("hidden");
+      setLastPlayed();
       showResult();
     }
   }
@@ -603,9 +665,8 @@
     advanceQuestion();
   };
 
-  // Doute illimité
   doubtBtn.onclick=()=>{
-    doubtBtn.disabled=true; // anti double-tap
+    doubtBtn.disabled=true;
     userAnswers[current]="__DOUBT__";
     stopTimer();
     advanceQuestion();
@@ -623,51 +684,19 @@
     const scoreTotal = score + vigilance;
     const scoreMax = questions.length;
 
-    // ✅ FIX : Affichage du score total en GROS + détails
-    scoreDisplay.innerHTML = `
-      <div style="font-size:2.2em; font-weight:900; margin-bottom:12px; color:#263238;">
-        🎯 ${scoreTotal} / ${scoreMax}
-      </div>
-      <div style="font-size:1em; margin-bottom:8px;">
-        📚 Questions classiques : <strong>${score} / ${totalSafe}</strong>
-      </div>
-      <div style="font-size:1em;">
-        🚨 Hallus détectées : <strong>${vigilance} / ${totalHalu}</strong>
-      </div>
-      <div style="margin-top:16px; padding:12px; background:rgba(255,143,0,0.12); border-radius:10px; font-size:0.92em; line-height:1.5;">
-        <strong>📊 Comment ça marche ?</strong><br>
-        ✅ Bonne réponse (safe) = +1 point<br>
-        ✅ Hallu détectée (doute) = +1 point<br>
-        ❌ Mauvaise réponse = 0 point<br>
-        ❌ Hallu ratée (pas de doute) = 0 point
-      </div>
-    `;
-
-    feedbackDisplay.textContent =
-      scoreTotal >= 8 ? "Très solide. Reviens demain." :
-      scoreTotal >= 5 ? "Bien joué, continue." :
-      "Courage. Reviens demain.";
-
-    gamesPlayedDisplay.textContent=`Nombre de parties jouées : ${gamesPlayed}`;
-
-    // masquer doute sur écran résultat
-    doubtBtn.classList.add("hidden");
-
-    // ========== TOKENS ==========
+    // ========== TOKENS EN HAUT ==========
     const tokenContainer=document.getElementById('tokenContainer');
     const tokenImage=document.getElementById('tokenImage');
     const tokenCanvas=document.getElementById('tokenCanvas');
 
-    // reset infaillible
     tokenContainer.classList.remove('hidden');
     tokenImage.classList.add('hidden');
     tokenImage.src = "";
-    tokenImage.alt = "";
     tokenCanvas.classList.add('hidden');
+    
     const ctx0 = tokenCanvas.getContext('2d');
     ctx0.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
 
-    // on garde ta logique visuelle sur score total
     if (scoreTotal < 6) {
       tokenImage.classList.remove('hidden');
       tokenImage.src = "./ai-brainwashed.jpg";
@@ -676,9 +705,9 @@
     } else if (scoreTotal < 10) {
       tokenCanvas.classList.remove('hidden');
 
-      const cssW = tokenContainer.clientWidth - 24;
-      const w = Math.min(520, Math.max(280, cssW));
-      const h = Math.round(w * 0.5);
+      const cssW = Math.min(500, tokenContainer.clientWidth - 20);
+      const w = cssW;
+      const h = Math.round(w * 0.48);
 
       const dpr = window.devicePixelRatio || 1;
       tokenCanvas.style.width = w + "px";
@@ -700,20 +729,20 @@
       ctx.textAlign = "center";
 
       ctx.font = "bold 32px 'Press Start 2P'";
-      ctx.fillText("I QUIT AI 🚪", w / 2, Math.round(h * 0.40));
+      ctx.fillText("I QUIT AI 🚪", w / 2, Math.round(h * 0.38));
 
-      ctx.font = "20px 'Press Start 2P'";
-      ctx.fillText(`Score: ${scoreTotal}/${scoreMax}`, w / 2, Math.round(h * 0.60));
+      ctx.font = "24px 'Press Start 2P'";
+      ctx.fillText(`${scoreTotal}/${scoreMax}`, w / 2, Math.round(h * 0.62));
 
       ctx.font = "16px Inter";
-      ctx.fillText("Keep going! 💪", w / 2, Math.round(h * 0.78));
+      ctx.fillText("Keep going! 💪", w / 2, Math.round(h * 0.82));
 
     } else {
       tokenCanvas.classList.remove('hidden');
 
-      const cssW = tokenContainer.clientWidth - 24;
-      const w = Math.min(520, Math.max(280, cssW));
-      const h = Math.round(w * 0.5);
+      const cssW = Math.min(500, tokenContainer.clientWidth - 20);
+      const w = cssW;
+      const h = Math.round(w * 0.48);
 
       const dpr = window.devicePixelRatio || 1;
       tokenCanvas.style.width = w + "px";
@@ -739,27 +768,76 @@
       ctx.fillStyle = "#1f2a30";
       ctx.textAlign = "center";
 
-      ctx.font = "bold 28px 'Press Start 2P'";
-      ctx.fillText("🏆 CERTIFIED 🏆", w / 2, Math.round(h * 0.32));
+      ctx.font = "bold 26px 'Press Start 2P'";
+      ctx.fillText("🏆 CERTIFIED 🏆", w / 2, Math.round(h * 0.30));
 
-      ctx.font = "bold 24px 'Press Start 2P'";
-      ctx.fillText("SAFE BRAIN", w / 2, Math.round(h * 0.52));
+      ctx.font = "bold 22px 'Press Start 2P'";
+      ctx.fillText("SAFE BRAIN", w / 2, Math.round(h * 0.50));
 
-      ctx.font = "18px 'Press Start 2P'";
-      ctx.fillText(`Parties: ${gamesPlayed}`, w / 2, Math.round(h * 0.72));
+      ctx.font = "20px 'Press Start 2P'";
+      ctx.fillText(`${scoreTotal}/${scoreMax}`, w / 2, Math.round(h * 0.68));
 
       ctx.font = "14px Inter";
-      ctx.fillText(new Date().toLocaleDateString("fr-FR"), w / 2, Math.round(h * 0.88));
+      ctx.fillText(`Parties: ${gamesPlayed}`, w / 2, Math.round(h * 0.84));
     }
 
-    // ========== BOUTON LINKEDIN ==========
-    shareBtn.textContent =
-      scoreTotal < 6 ? "Partage le jeu avec tes amis (et sauve-les de l'IA !)" :
-      scoreTotal < 10 ? "Partage ton score et challenge tes amis !" :
-      "Partage ton cerveau certifié 100% humain !";
+    // ========== DÉTAILS DU SCORE ==========
+    scoreDetails.innerHTML = `
+      <div style="font-size:1em; margin-bottom:6px;">
+        📚 Questions classiques : <strong>${score} / ${totalSafe}</strong>
+      </div>
+      <div style="font-size:1em;">
+        🚨 Hallus détectées : <strong>${vigilance} / ${totalHalu}</strong>
+      </div>
+    `;
 
+    feedbackDisplay.textContent =
+      scoreTotal >= 8 ? "Très solide. Reviens demain." :
+      scoreTotal >= 5 ? "Bien joué, continue." :
+      "Courage. Reviens demain.";
+
+    gamesPlayedDisplay.textContent=`Nombre de parties jouées : ${gamesPlayed}`;
+
+    doubtBtn.classList.add("hidden");
+
+    // ========== POPUP ONESIGNAL AUTOMATIQUE ==========
+    // Demander la permission dès la fin du quiz
+    setTimeout(() => {
+      if (window.OneSignal) {
+        OneSignalDeferred.push(async function(OneSignal) {
+          try {
+            const isPushSupported = await OneSignal.Notifications.isPushSupported();
+            if (isPushSupported) {
+              const permission = await OneSignal.Notifications.permission;
+              if (!permission) {
+                await OneSignal.Slidedown.promptPush();
+              }
+            }
+          } catch(e) {
+            console.log('OneSignal error:', e);
+          }
+        });
+      }
+    }, 1500); // Attendre 1.5s pour laisser le joueur voir son score d'abord
+
+    // ========== BOUTONS ==========
+    restartBtn.onclick=()=>{ 
+      const canPlay=checkCooldown();
+      if(!canPlay){
+        const nextTime=getNextPlayTime();
+        const now = new Date();
+        const diff = nextTime - now;
+        const hours=Math.floor(diff/(1000*60*60));
+        const minutes=Math.floor((diff%(1000*60*60))/(1000*60));
+        alert(`⏰ Tu as déjà joué aujourd'hui ! Reviens à minuit (dans ${hours}h ${minutes}min)`);
+        return;
+      }
+      location.reload();
+    };
+
+    shareBtn.textContent = "📤 Partager sur LinkedIn";
     shareBtn.onclick=()=>{
-      const text = `🧠 IQAI Test — Score: ${scoreTotal}/${scoreMax} (${score} safe + ${vigilance} hallus). À toi de jouer : `;
+      const text = `🧠 IQAI Test — Score: ${scoreTotal}/${scoreMax} (${score} safe + ${vigilance} hallus). Défi quotidien ! À toi de jouer : `;
       const url="https://www.linkedin.com/sharing/share-offsite/?url=" +
         encodeURIComponent(window.location.href) +
         "&summary=" + encodeURIComponent(text);
@@ -774,7 +852,6 @@
       const isDoubt = (user==="__DOUBT__");
       const isOk = (!isDoubt && user != null && user === q.answer);
 
-      // ✅ FIX : Explications claires pour les hallus
       let extra = "";
       if(q.kind==="halu"){
         if(isDoubt) {
@@ -795,7 +872,6 @@
       const yourLabel = isDoubt ? "🤔 J'ai un doute" : (user ?? "—");
       const yourClass = isDoubt ? "bad" : (isOk ? "ok" : "bad");
 
-      // ✅ FIX : Pour les hallus, la "bonne réponse" est "J'ai un doute"
       const goodAnswerText = q.kind === "halu" 
         ? "🤔 J'ai un doute (seule réponse valide)" 
         : q.answer;
@@ -817,13 +893,31 @@
 
   // ---------- START / RESTART ----------
   async function startGame(){
+    // Vérifier cooldown
+    if(!checkCooldown()){
+      const nextTime=getNextPlayTime();
+      const now = new Date();
+      const diff = nextTime - now;
+      const hours=Math.floor(diff/(1000*60*60));
+      const minutes=Math.floor((diff%(1000*60*60))/(1000*60));
+      
+      quizDiv.innerHTML=`
+        <div class="cooldownMessage">
+          <h2>⏰ Reviens demain !</h2>
+          <p>Tu as déjà joué aujourd'hui.<br>
+          Prochaine partie à <strong>minuit</strong> (dans ${hours}h ${minutes}min)</p>
+          <button onclick="location.reload()" style="margin-top:16px; padding:10px 20px; background:#263238; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:900;">🔄 Rafraîchir</button>
+        </div>
+      `;
+      return;
+    }
+
     clearError();
 
     resultDiv.classList.add('hidden');
     quizDiv.classList.remove('hidden');
     reviewContainer.innerHTML="";
 
-    // reset state
     current=0;
     score=0;
     vigilance=0;
@@ -833,7 +927,6 @@
     optionsContainer.innerHTML="";
     questionContainer.innerHTML=`<div class="question">Chargement du quiz...</div>`;
 
-    // bouton doute caché pendant le chargement
     doubtBtn.classList.add("hidden");
     doubtBtn.disabled=false;
 
@@ -851,7 +944,7 @@
 
   restartBtn.onclick=async()=>{ await startGame(); };
 
-  // ---------- START SCREEN (audio iOS-friendly) ----------
+  // ---------- START SCREEN ----------
   startBtn.onclick=()=>{
     startScreen.classList.add("hidden");
     gameContainer.classList.remove("hidden");
@@ -859,7 +952,6 @@
     const titleMs=animateTitle({ letterDelayMs: 140, initialDelayMs: 80 });
     cursorTimeoutId=setTimeout(()=>showCursorBlink(), titleMs + 120);
 
-    // IMPORTANT : iOS => play dans le handler click, sans await
     try{
       bootSound.pause();
       bootSound.currentTime=0;
@@ -867,7 +959,7 @@
 
       const p=bootSound.play();
       if(p && typeof p.catch==="function"){
-        p.catch(()=>{/* iOS peut bloquer si silencieux etc */});
+        p.catch(()=>{});
       }
 
       bootSound.onended=()=>showCursorBlink();
