@@ -216,12 +216,14 @@
   #tokenContainer{
     width: min(520px, 100%);
     margin: 0 auto 16px auto;
-    padding: 8px 8px 8px 8px;
+    padding: 0;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     overflow: hidden;
-    line-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   #tokenImage{
@@ -232,7 +234,6 @@
     object-fit: cover;
     margin: 0;
     padding: 0;
-    vertical-align: bottom;
   }
 
   #tokenCanvas{
