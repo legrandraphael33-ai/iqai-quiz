@@ -216,7 +216,7 @@
   #tokenContainer{
     width: min(520px, 100%);
     margin: 0 auto 16px auto;
-    padding: 0;
+    padding: 8px;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
@@ -228,12 +228,11 @@
 
   #tokenImage{
     display:block;
-    width:100%;
+    max-width: 100%;
     height:auto;
     border-radius:14px;
-    object-fit: cover;
-    margin: 0;
-    padding: 0;
+    object-fit: contain;
+    margin: 0 auto;
   }
 
   #tokenCanvas{
