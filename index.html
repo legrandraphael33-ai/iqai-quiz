@@ -213,49 +213,28 @@
     line-height:1.5;
   }
 
-/* ===== TOKEN: anti-overlay / anti-position parasite ===== */
+  #tokenContainer{
+    width: min(520px, 100%);
+    margin: 0 auto 16px auto;
+    padding: 12px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
 
-/* ===== TOKENS (image + canvas) — VERSION SAFE ===== */
-#tokenContainer{
-  width: min(520px, 100%);
-  margin: 16px auto;
-  padding: 0;
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-}
+  #tokenImage{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:14px;
+  }
 
-/* Force l’image OU le canvas à remplir le container — seulement si visible */
-#tokenContainer #tokenImage:not(.hidden),
-#tokenContainer #tokenCanvas:not(.hidden){
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  margin: 0;
-  border-radius: 0; /* radius sur le container */
-}
-
-  #tokenContainer .hidden{
-  display: none !important;
-}
-
-
-  /* FIX uniquement pour l’image AI brainwashed */
-#tokenContainer #tokenImage{
-  height: 420px !important;
-  object-fit: cover !important;
-  object-position: center 20% !important;
-}
-
-
-/* Le canvas garde un bon ratio visuel */
-#tokenContainer #tokenCanvas{
-  aspect-ratio: 2 / 1;
-}
-
-
+  #tokenCanvas{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:14px;
+  }
 
   #startBtn{
     width:100%;
@@ -794,22 +773,40 @@
     ctx0.clearRect(0, 0, tokenCanvas.width, tokenCanvas.height);
 
     if (scoreTotal < 6) {
-      tokenImage.classList.remove('hidden');
-      tokenImage.src = "./ai-brainwashed.jpg";
-      tokenImage.alt = "AI BRAINWASHED";
-      
-      // Ajouter le gros score sous l'image
-      scoreDetails.innerHTML = `
-        <div style="font-size:2.5em; font-weight:900; margin:16px 0 12px 0; color:#263238;">
-          🎯 ${scoreTotal} / ${scoreMax}
-        </div>
-        <div style="font-size:1em; margin-bottom:6px;">
-          📚 Questions classiques : <strong>${score} / ${totalSafe}</strong>
-        </div>
-        <div style="font-size:1em;">
-          🚨 Hallus détectées : <strong>${vigilance} / ${totalHalu}</strong>
-        </div>
-      `;
+      tokenCanvas.classList.remove('hidden');
+
+      const cssW = Math.min(500, tokenContainer.clientWidth - 20);
+      const w = cssW;
+      const h = Math.round(w * 0.48);
+
+      const dpr = window.devicePixelRatio || 1;
+      tokenCanvas.style.width = w + "px";
+      tokenCanvas.style.height = h + "px";
+      tokenCanvas.width = Math.round(w * dpr);
+      tokenCanvas.height = Math.round(h * dpr);
+
+      const ctx = tokenCanvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      // Fond rouge/orange dégradé
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, "#ff6b6b");
+      grad.addColorStop(1, "#ff8787");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = "#1f2a30";
+      ctx.textAlign = "center";
+
+      ctx.font = "bold 28px 'Press Start 2P'";
+      ctx.fillText("⚠️ AI BRAINWASHED ⚠️", w / 2, Math.round(h * 0.30));
+
+      ctx.font = "24px 'Press Start 2P'";
+      ctx.fillText(`${scoreTotal}/${scoreMax}`, w / 2, Math.round(h * 0.55));
+
+      ctx.font = "16px Inter";
+      ctx.fillText("Reviens demain 💪", w / 2, Math.round(h * 0.78));
 
     } else if (scoreTotal < 10) {
       tokenCanvas.classList.remove('hidden');
