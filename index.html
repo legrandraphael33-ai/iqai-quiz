@@ -214,25 +214,37 @@
   }
 
 #tokenContainer{
-  background: transparent;
-  padding: 0;
-  box-shadow: none;
+  width: min(520px, 100%);
+  margin: 16px auto;
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
+/* IMAGE (<6/10) */
 #tokenImage{
   display:block;
   width:100%;
   height:auto;
-  border-radius:14px;
+  border-radius:12px;
 }
 
+/* CANVAS (6+ et 10/10) */
+#tokenCanvas{
+  display:block;
 
-  #tokenCanvas{
-    display:block;
-    width:100%;
-    height:auto;
-    border-radius:14px;
-  }
+  width:100%;
+  max-width:500px;   /* IMPORTANT */
+  height:auto;
+
+  border-radius:12px;
+}
+
 
   #startBtn{
     width:100%;
