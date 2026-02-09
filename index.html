@@ -216,21 +216,22 @@
  #tokenContainer{
   width: min(520px, 100%);
   margin: 0 auto 16px auto;
-  padding: 12px 12px 0 12px;  /* ← 0 en bas au lieu de 8px */
+  padding: 0;                 /* ← enlève le blanc */
   background: #fff;
   border-radius: 16px;
+  overflow: hidden;           /* ← coupe tout débordement */
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  line-height: 0;
 }
+
 
 #tokenImage{
   display:block;
   width:100%;
-  height: 360px;
-  border-radius:14px;
-  object-fit: cover;
-  object-position: center top;
+  height:auto;                /* ← enlève la hauteur fixe */
+  object-fit: cover;          /* (optionnel si height:auto) */
+  border-radius: 0;           /* ← important : le radius est porté par le container */
 }
+
 
   #tokenCanvas{
     display:block;
