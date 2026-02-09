@@ -226,16 +226,21 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* Force l’image ET le canvas à remplir le container */
-#tokenContainer #tokenImage,
-#tokenContainer #tokenCanvas{
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  margin: 0 !important;
-  border-radius: 0 !important; /* le radius est sur le container */
+/* Force l’image OU le canvas à remplir le container — seulement si visible */
+#tokenContainer #tokenImage:not(.hidden),
+#tokenContainer #tokenCanvas:not(.hidden){
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 0; /* radius sur le container */
 }
+
+  #tokenContainer .hidden{
+  display: none !important;
+}
+
 
   /* FIX uniquement pour l’image AI brainwashed */
 #tokenContainer #tokenImage{
