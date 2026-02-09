@@ -213,37 +213,50 @@
     line-height:1.5;
   }
 
+/* ===== TOKEN: anti-overlay / anti-position parasite ===== */
+
 #tokenContainer{
   width: min(520px, 100%);
   margin: 16px auto;
   padding: 10px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;   /* important */
+  overflow: hidden;     /* coupe tout débordement */
 }
 
-/* IMAGE (<6/10) */
+/* Force l’image à rester dans le flow */
 #tokenImage{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:12px;
+  position: static !important;
+  float: none !important;
+  transform: none !important;
+
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 0 auto;
 }
 
-/* CANVAS (6+ et 10/10) */
+/* Canvas pareil: jamais en absolute */
 #tokenCanvas{
-  display:block;
+  position: static !important;
+  transform: none !important;
 
-  width:100%;
-  max-width:500px;   /* IMPORTANT */
-  height:auto;
-
-  border-radius:12px;
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 12px;
+  margin: 0 auto;
 }
+
 
 
   #startBtn{
