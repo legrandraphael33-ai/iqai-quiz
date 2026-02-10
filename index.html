@@ -437,6 +437,21 @@
 
       <!-- REVIEW DES QUESTIONS -->
       <div id="reviewContainer"></div>
+
+      <div id="rankingSection" style="margin-top: 25px; padding: 20px; background: #fdfdfd; border-radius: 15px; border: 2px solid #263238; text-align: left;">
+          <h3 style="margin-top:0; color:#263238; font-size: 1.2em; font-family: var(--body-font);">🏆 Podium du Jour</h3>
+          <div id="leaderboardList" style="margin-bottom: 20px; font-family: var(--body-font);">
+              <p style="font-size: 0.9em; color: #666;">Chargement des champions...</p>
+          </div>
+
+          <div id="pseudoInputArea" style="background: #f1f1f1; padding: 15px; border-radius: 10px; font-family: var(--body-font);">
+              <label style="display: block; font-size: 0.8em; margin-bottom: 8px; font-weight: bold;">TON PSEUDO POUR LE TOP 3 :</label>
+              <div style="display: flex; gap: 8px;">
+                  <input type="text" id="playerPseudo" maxlength="12" placeholder="Ex: Raph" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                  <button onclick="submitScore()" style="background: #263238; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer;">OK</button>
+              </div>
+          </div>
+      </div>
       
       <!-- COMMENT ÇA MARCHE (tout en bas) -->
       <div id="howItWorks" style="margin-top:20px; padding:12px; background:rgba(255,143,0,0.12); border-radius:10px; font-size:0.92em; line-height:1.5;">
@@ -990,6 +1005,7 @@ function advanceQuestion(){
       `;
       reviewContainer.appendChild(div);
     });
+    loadLeaderboard();
 }
   // ---------- START / RESTART ----------
   async function startGame(){
@@ -1112,6 +1128,77 @@ function advanceQuestion(){
 
   // Exposer la fonction globalement pour l'appeler après le quiz
   window.showNotifPopup = showNotifPopup;
+  // ==========================================
+//      FONCTIONS POUR LE CLASSEMENT (RANKING)
+// ==========================================
+
+// 1. Charger et afficher le Top 3
+async function loadLeaderboard() {
+    const list = document.getElementById('leaderboardList');
+    if (!list) return;
+
+    try {
+        const res = await fetch('/api/leaderboard');
+        const top3 = await res.json();
+
+        if (!top3 || top3.length === 0) {
+            list.innerHTML = "<p style='font-size:0.9em; color:#888; font-style:italic;'>Personne n'a encore bravé l'IA aujourd'hui. Sois le premier !</p>";
+        } else {
+            list.innerHTML = top3.map((p, i) => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                    <span style="font-size: 1.05em;">
+                        ${i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'} 
+                        <strong>${p.pseudo}</strong>
+                    </span>
+                    <span style="background: #263238; color: white; padding: 3px 10px; border-radius: 6px; font-weight: bold; font-family: sans-serif;">
+                        ${p.score} pts
+                    </span>
+                </div>
+            `).join('');
+        }
+    } catch (err) {
+        console.error("Erreur ranking:", err);
+        list.innerHTML = "<p style='color:#a8164a; font-size:0.9em;'>Le classement est temporairement indisponible.</p>";
+    }
+}
+
+// 2. Envoyer le score du joueur
+async function submitScore() {
+    const pseudoInput = document.getElementById('playerPseudo');
+    const pseudo = pseudoInput.value.trim();
+    
+    if (!pseudo) {
+        alert("Hé ! Il nous faut un petit nom pour le podium !");
+        return;
+    }
+
+    if (pseudo.length < 2) {
+        alert("Ton pseudo est un peu court, non ? (2 caractères min)");
+        return;
+    }
+
+    // On récupère le score total calculé dans showResult
+    const finalScore = score + vigilance;
+
+    try {
+        const response = await fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pseudo: pseudo, score: finalScore }) 
+        });
+
+        if (response.ok) {
+            // Si c'est bon, on cache la zone de saisie et on rafraîchit le podium
+            document.getElementById('pseudoInputArea').style.display = 'none';
+            await loadLeaderboard();
+        } else {
+            alert("Petit souci technique lors de l'envoi du score.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Impossible de joindre le serveur pour enregistrer ton score.");
+    }
+}
 </script>
 </body>
 </html>
