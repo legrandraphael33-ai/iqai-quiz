@@ -625,33 +625,37 @@
   }
 
   async function loadQuestions(){
-    const usedQuestions = JSON.parse(localStorage.getItem('usedQuestions') || '[]');
+    // 1. On récupère les IDs déjà joués
+    const playedIds = JSON.parse(localStorage.getItem('playedIds') || '[]');
     
-    const opts={
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      cache:"no-store",
-      body: JSON.stringify({ avoid: usedQuestions.slice(-30) })
+    const opts = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      // On envoie 'playedIds' pour que le backend (api/quiz.js) le reçoive bien
+      body: JSON.stringify({ playedIds }) 
     };
 
     let res;
-    try{
-      res=await fetchWithTimeout(API_URL, opts, 30000);
-    }catch(e){
-      res=await fetchWithTimeout(API_URL, opts, 35000);
+    try {
+      res = await fetchWithTimeout(API_URL, opts, 30000);
+    } catch(e) {
+      res = await fetchWithTimeout(API_URL, opts, 35000);
     }
 
     if(!res || !res.ok) throw new Error("Le backend ne répond pas (HTTP "+(res?res.status:"—")+").");
 
-    const raw=await res.json();
-    const quiz=normalizeQuiz(raw);
-    if(!quiz) throw new Error("Quiz invalide.");
-    questions=quiz;
+    const raw = await res.json();
+    const quiz = normalizeQuiz(raw);
     
-    const newQuestions = questions.map(q => q.q);
-    const updated = [...usedQuestions, ...newQuestions].slice(-100);
-    localStorage.setItem('usedQuestions', JSON.stringify(updated));
-  }
+    if(!quiz) throw new Error("Quiz invalide.");
+    
+    questions = quiz;
+    
+    // Note : On ne sauvegarde pas encore les IDs ici ! 
+    // On attend la fin de la partie (dans showResult) pour être sûr 
+    // que le joueur a bien vu les questions.
+}
 
   // ---------- TIMER ----------
   function stopTimer(){
@@ -753,6 +757,10 @@
 
     gamesPlayed++;
     localStorage.setItem("gamesPlayed", String(gamesPlayed));
+    const playedIds = JSON.parse(localStorage.getItem('playedIds') || '[]');
+    const currentIds = questions.map(q => q.id || q.q); 
+    const updatedIds = [...new Set([...playedIds, ...currentIds])].slice(-200); 
+    localStorage.setItem('playedIds', JSON.stringify(updatedIds));
 
     const totalHalu = questions.filter(q=>q.kind==="halu").length;
     const totalSafe = questions.length - totalHalu;
