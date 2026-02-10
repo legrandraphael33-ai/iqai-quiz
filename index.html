@@ -716,28 +716,32 @@
     startTimer();
   }
 
-  function advanceQuestion(){
-    const qObj=questions[current];
-    const selected=userAnswers[current];
-    const usedDoubt=(selected==="__DOUBT__");
+function advanceQuestion(){
+    const qObj = questions[current];
+    const selected = userAnswers[current];
+    const isDoubt = (selected === "__DOUBT__");
 
-    if(qObj.kind==="halu"){
-      if(usedDoubt) vigilance += 1;
+    // LOGIQUE DE POINTS :
+    if (qObj.kind === "halu") {
+        // Point seulement si on a cliqué sur le doute
+        if (isDoubt) vigilance += 1; 
+        // Sinon (réponse choisie), c'est 0 point d'office
     } else {
-      if(selected != null && selected === qObj.answer) score += 1;
+        // Question Safe : Point seulement si la réponse est exacte (et pas doute)
+        if (!isDoubt && selected === qObj.answer) score += 1;
     }
 
     current++;
 
     if(current < questions.length){
-      showQuestion();
+        showQuestion();
     } else {
-      stopTimer();
-      timerDisplay.classList.add("hidden");
-      setLastPlayed();
-      showResult();
+        stopTimer();
+        timerDisplay.classList.add("hidden");
+        setLastPlayed();
+        showResult();
     }
-  }
+}
 
   nextBtn.onclick=()=>{
     stopTimer();
@@ -943,52 +947,50 @@
     };
 
     // ========== REVIEW ==========
-    reviewContainer.innerHTML="<h3>Review des questions</h3>";
+    reviewContainer.innerHTML = "<h3>Review des questions</h3>";
 
-    questions.forEach((q,i)=>{
-      const user=userAnswers[i];
-      const isDoubt = (user==="__DOUBT__");
-      const isOk = (!isDoubt && user != null && user === q.answer);
+    questions.forEach((q, i) => {
+      const user = userAnswers[i];
+      const isDoubt = (user === "__DOUBT__");
+      const isCorrectSafe = (q.kind === "safe" && user === q.answer);
+      const isCorrectHalu = (q.kind === "halu" && isDoubt);
 
-      let extra = "";
-      if(q.kind==="halu"){
-        if(isDoubt) {
-          extra = `<div class="haluBanner">
-            🚨 <strong>ALERTE HALLU IA</strong> — Bien vu ! Tu as repéré le piège.<br>
-            <em>Cette question contenait une incohérence volontaire. Il n'y avait pas de bonne réponse.</em><br>
-            ✅ <strong>+1 point de vigilance</strong>
-          </div>`;
+      let statusHTML = "";
+      let itemClass = "";
+
+      if (q.kind === "halu") {
+        if (isCorrectHalu) {
+          itemClass = "ok";
+          statusHTML = `<div class="haluBanner">✅ <strong>BIEN JOUÉ :</strong> Tu es resté vigilant, c'était une hallucination. (+1 pt)</div>`;
         } else {
-          extra = `<div class="haluBanner">
-            🚨 <strong>ALERTE HALLU IA</strong> — L'IA t'a berné.<br>
-            <em>Cette question contenait une incohérence volontaire. Il fallait cliquer sur "J'ai un doute".</em><br>
-            ❌ <strong>0 point</strong>
-          </div>`;
+          itemClass = "bad";
+          statusHTML = `<div class="haluBanner" style="background:rgba(255,60,120,0.15); border-color:#a8164a; color:#a8164a;">❌ <strong>BERNÉ PAR L'IA :</strong> Tu as répondu à une fausse information. (0 pt)</div>`;
+        }
+      } else {
+        if (isCorrectSafe) {
+          itemClass = "ok";
+          statusHTML = `<div style="color:#1f7a3f; font-weight:700; margin-top:8px;">✅ Bonne réponse ! (+1 pt)</div>`;
+        } else if (isDoubt) {
+          itemClass = "bad";
+          statusHTML = `<div style="color:#a8164a; font-weight:700; margin-top:8px;">❌ <strong>DOMMAGE :</strong> Tu as douté d'une info pourtant vraie. (0 pt)</div>`;
+        } else {
+          itemClass = "bad";
+          statusHTML = `<div style="color:#a8164a; font-weight:700; margin-top:8px;">❌ Mauvaise réponse. (0 pt)</div>`;
         }
       }
 
-      const yourLabel = isDoubt ? "🤔 J'ai un doute" : (user ?? "—");
-      const yourClass = isDoubt ? "bad" : (isOk ? "ok" : "bad");
-
-      const goodAnswerText = q.kind === "halu" 
-        ? "🤔 J'ai un doute (seule réponse valide)" 
-        : q.answer;
-
-      const div=document.createElement('div');
-      div.className="reviewItem";
-      div.innerHTML=`
+      const div = document.createElement('div');
+      div.className = "reviewItem";
+      div.innerHTML = `
         <strong>Q${i+1}:</strong> ${q.q}<br>
-        <strong>Votre réponse:</strong>
-          <span class="answerTag ${yourClass}">${yourLabel}</span><br>
-        <strong>Bonne réponse:</strong>
-          <span class="answerTag ok">${goodAnswerText}</span><br>
-        <em>Explication:</em> ${q.explanation}
-        ${extra}
+        <strong>Ta réponse :</strong> <span class="answerTag ${isCorrectSafe || isCorrectHalu ? 'ok' : 'bad'}">${isDoubt ? "🤔 J'ai un doute" : (user || "Temps écoulé")}</span><br>
+        <strong>Vérité :</strong> ${q.kind === "halu" ? "Incohérence IA" : q.answer}<br>
+        <div style="margin-top:5px; font-size:0.9em; opacity:0.8;"><em>Note : ${q.explanation}</em></div>
+        ${statusHTML}
       `;
       reviewContainer.appendChild(div);
     });
-  }
-
+}
   // ---------- START / RESTART ----------
   async function startGame(){
     // Vérifier cooldown
